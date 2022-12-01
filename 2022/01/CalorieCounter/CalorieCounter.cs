@@ -2,20 +2,20 @@
 
 public class CalorieCounter
 {
-    public int FindMaxCalories(IEnumerable<string> list)
+    public int GetMaxCalorieCount(IEnumerable<string> list)
     {
-        var groupedCalories = GetGroupedCalories(list);
+        var groupedCalories = GetGroupedCalorieCounts(list);
         return groupedCalories.Values.Max();
     }
 
-    public int FindSumOfTop3Calories(IEnumerable<string> list)
+    public int GetSumOfTop3CalorieCounts(IEnumerable<string> list)
     {
-        var groupedCalories = GetGroupedCalories(list);
+        var groupedCalories = GetGroupedCalorieCounts(list);
         var orderedCalorieCounts = groupedCalories.Values.OrderDescending();
         return orderedCalorieCounts.Take(3).Sum();
     }
 
-    private static Dictionary<int, int> GetGroupedCalories(IEnumerable<string> list)
+    private static Dictionary<int, int> GetGroupedCalorieCounts(IEnumerable<string> list)
     {
         int groupCounter = 0;
         int groupTotal = 0;
