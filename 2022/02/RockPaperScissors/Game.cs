@@ -5,9 +5,45 @@ public class Game
     public int GetPlayer2TotalScore(IEnumerable<string> playLines)
     {
         var parsedPlays = ParsePlays(playLines);
-        var scoredPlays = ScorePlays(parsedPlays);
-        
-        return scoredPlays.Sum(x => x.Player2);
+
+        var player2Score = 0;
+        foreach (var play in parsedPlays)
+        {
+            switch (play.Player1)
+            {
+                case 'A' when play.Player2 == 'X':
+                    player2Score += 4;
+                    break;
+                case 'A' when play.Player2 == 'Y':
+                    player2Score += 8;
+                    break;
+                case 'A' when play.Player2 == 'Z':
+                    player2Score += 3;
+                    break;
+                
+                case 'B' when play.Player2 == 'X':
+                    player2Score += 1;
+                    break;
+                case 'B' when play.Player2 == 'Y':
+                    player2Score += 5;
+                    break;
+                case 'B' when play.Player2 == 'Z':
+                    player2Score += 9;
+                    break;
+                
+                case 'C' when play.Player2 == 'X':
+                    player2Score += 7;
+                    break;
+                case 'C' when play.Player2 == 'Y':
+                    player2Score += 2;
+                    break;
+                case 'C' when play.Player2 == 'Z':
+                    player2Score += 6;
+                    break;
+            }
+        }
+
+        return player2Score;
     }
 
     private IEnumerable<Play> ParsePlays(IEnumerable<string> playLines)
@@ -17,51 +53,4 @@ public class Game
             .Select(plays => new Play(Convert.ToChar(plays[0]), Convert.ToChar(plays[1])))
             .ToList();
     }
-
-    private IEnumerable<Score> ScorePlays(IEnumerable<Play> plays)
-    {
-        List<Score> scores = new();
-        
-        foreach (var play in plays)
-        {
-            var player1Score = 0;
-            var player2Score = 0;
-
-            player1Score = play.Player1 switch
-            {
-                'A' => 1,
-                'B' => 2,
-                'C' => 3,
-                _ => throw new ArgumentException($"Unknown play '{play.Player1}' for player 1.")
-            };
-
-            player2Score = play.Player2 switch
-            {
-                'X' => 1,
-                'Y' => 2,
-                'Z' => 3,
-                _ => throw new ArgumentException($"Unknown play '{play.Player2}' for player 2.")
-            };
-
-            if (player1Score > player2Score)
-            {
-                player1Score += 6;
-            }
-            else if (player2Score > player1Score)
-            {
-                player2Score += 6;
-            }
-            else
-            {
-                player1Score += 3;
-                player2Score += 3;
-            }
-            
-            scores.Add(new Score(player1Score, player2Score));
-        }
-        
-        return scores;
-    }
-    
-    
 }

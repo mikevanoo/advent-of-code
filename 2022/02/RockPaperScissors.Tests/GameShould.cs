@@ -16,6 +16,6 @@ public class GameShould
     public void Given_MyInput_Get_Player_2_Total_Score()
     {
         var playLines = TestUtils.ReadEmbeddedResourceLines(@"TestData\MyInput.txt");
-        new Game().GetPlayer2TotalScore(playLines).Should().Be(11876);
+        new Game().GetPlayer2TotalScore(playLines).Should().Be(13484);
     }
 }
