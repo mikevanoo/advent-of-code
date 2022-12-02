@@ -2,48 +2,23 @@ namespace RockPaperScissors;
 
 public class Game
 {
-    public int GetPlayer2TotalScore(IEnumerable<string> playLines)
+    public int GetPlayer2TotalScoreForPart1(IEnumerable<string> playLines)
     {
         var parsedPlays = ParsePlays(playLines);
 
-        var player2Score = 0;
-        foreach (var play in parsedPlays)
+        return parsedPlays.Sum(play => play.Player1 switch
         {
-            switch (play.Player1)
-            {
-                case 'A' when play.Player2 == 'X':
-                    player2Score += 4;
-                    break;
-                case 'A' when play.Player2 == 'Y':
-                    player2Score += 8;
-                    break;
-                case 'A' when play.Player2 == 'Z':
-                    player2Score += 3;
-                    break;
-                
-                case 'B' when play.Player2 == 'X':
-                    player2Score += 1;
-                    break;
-                case 'B' when play.Player2 == 'Y':
-                    player2Score += 5;
-                    break;
-                case 'B' when play.Player2 == 'Z':
-                    player2Score += 9;
-                    break;
-                
-                case 'C' when play.Player2 == 'X':
-                    player2Score += 7;
-                    break;
-                case 'C' when play.Player2 == 'Y':
-                    player2Score += 2;
-                    break;
-                case 'C' when play.Player2 == 'Z':
-                    player2Score += 6;
-                    break;
-            }
-        }
-
-        return player2Score;
+            'A' when play.Player2 == 'X' => 4,
+            'A' when play.Player2 == 'Y' => 8,
+            'A' when play.Player2 == 'Z' => 3,
+            'B' when play.Player2 == 'X' => 1,
+            'B' when play.Player2 == 'Y' => 5,
+            'B' when play.Player2 == 'Z' => 9,
+            'C' when play.Player2 == 'X' => 7,
+            'C' when play.Player2 == 'Y' => 2,
+            'C' when play.Player2 == 'Z' => 6,
+            _ => throw new InvalidOperationException($"Invalid plays.")
+        });
     }
 
     private IEnumerable<Play> ParsePlays(IEnumerable<string> playLines)
