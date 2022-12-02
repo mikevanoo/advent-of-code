@@ -5,7 +5,35 @@ public class Game
     public int GetPlayer2TotalScoreForPart1(IEnumerable<string> playLines)
     {
         var parsedPlays = ParsePlays(playLines);
+        return TotalScoreForPlayer2(parsedPlays);
+    }
 
+    public int GetPlayer2TotalScoreForPart2(IEnumerable<string> playLines)
+    {
+        var parsedPlays = ParsePlays(playLines);
+
+        foreach (var play in parsedPlays)
+        {
+            play.Player2 = play.Player1 switch
+            {
+                'A' when play.Player2 == 'X' => 'Z',
+                'A' when play.Player2 == 'Y' => 'X',
+                'A' when play.Player2 == 'Z' => 'Y',
+                'B' when play.Player2 == 'X' => 'X',
+                'B' when play.Player2 == 'Y' => 'Y',
+                'B' when play.Player2 == 'Z' => 'Z',
+                'C' when play.Player2 == 'X' => 'Y',
+                'C' when play.Player2 == 'Y' => 'Z',
+                'C' when play.Player2 == 'Z' => 'X',
+                _ => throw new InvalidOperationException($"Invalid plays.")
+            };
+        }
+        
+        return TotalScoreForPlayer2(parsedPlays);
+    }
+
+    private int TotalScoreForPlayer2(IEnumerable<Play> parsedPlays)
+    {
         return parsedPlays.Sum(play => play.Player1 switch
         {
             'A' when play.Player2 == 'X' => 4,
