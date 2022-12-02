@@ -1,13 +1,7 @@
 namespace RockPaperScissors;
 
-public record Play
+public record Play(char Player1, char Player2)
 {
-    public char Player1 { get; set; }
-    public char Player2 { get; set; }
-    
-    public Play(char player1, char player2)
-    {
-        Player1 = player1;
-        Player2 = player2;
-    }
+    public char Player1 { get; set; } = Player1;
+    public char Player2 { get; set; } = Player2;
 }
