@@ -12,10 +12,10 @@ public class Game
     {
         var parsedPlays = ParsePlays(playLines);
 
-        // switch player 2 play using the rules:
+        // adjust what player 2 plays such that they lose/draw/win using the following rules:
         // X means player 2 loses
         // Y means a draw
-        // Z means player wins
+        // Z means player 2 wins
         foreach (var play in parsedPlays)
         {
             play.Player2 = play.Player1 switch
