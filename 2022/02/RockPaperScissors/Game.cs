@@ -10,7 +10,7 @@ public class Game
 
     public int GetPlayer2TotalScoreForPart2(IEnumerable<string> playLines)
     {
-        var parsedPlays = ParsePlays(playLines);
+        var parsedPlays = ParsePlays(playLines).ToList();
 
         // adjust what player 2 plays such that they lose/draw/win using the following rules:
         // X means player 2 loses

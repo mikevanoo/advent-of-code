@@ -28,8 +28,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="TestData\*.txt" />
-      <EmbeddedResource Include="TestData\*.txt" />
+      <None Update="TestData\*.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
