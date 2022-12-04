@@ -27,4 +27,25 @@ public class Rucksack
         int priority = itemType;
         return char.IsLower(itemType) ? priority - 96 : priority - 38;
     }
+
+    public int GetTotalPrioritiesOfGroupBadges(string[] rucksackLines)
+    {
+        var groupBadges = GetCommonItemTypeInEachGroup(rucksackLines);
+        return groupBadges.Sum(GetItemTypePriority);
+    }
+
+    public char[] GetCommonItemTypeInEachGroup(string[] rucksackLines)
+    {
+        var groups = rucksackLines.Chunk(3).ToList();
+
+        List<char> commonItemTypes = new();
+        
+        foreach (var group in groups)
+        {
+            var inCommon = group[0].Intersect(group[1].Intersect(group[2])).ToList();
+            commonItemTypes.AddRange(inCommon);
+        }
+        
+        return commonItemTypes.ToArray();
+    }
 }

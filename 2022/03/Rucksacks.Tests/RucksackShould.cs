@@ -35,4 +35,26 @@ public class RucksackShould
         var rucksackLines = File.ReadAllLines(@"TestData\MyInput.txt"); 
         new Rucksack().GetTotalPrioritiesOfMisplacedItems(rucksackLines).Should().Be(8085);
     }
+    
+    [Fact]
+    public void Get_Common_Item_Type_In_Each_Group_In_Sample_Input()
+    {
+        var rucksackLines = File.ReadAllLines(@"TestData\SampleInput.txt"); 
+        var expectedCommonItemType = "rZ".ToCharArray(); 
+        new Rucksack().GetCommonItemTypeInEachGroup(rucksackLines).Should().ContainInOrder(expectedCommonItemType);
+    }
+    
+    [Fact]
+    public void Get_Total_Priorities_Of_Group_Badges_In_Sample_Input()
+    {
+        var rucksackLines = File.ReadAllLines(@"TestData\SampleInput.txt"); 
+        new Rucksack().GetTotalPrioritiesOfGroupBadges(rucksackLines).Should().Be(70);
+    }
+    
+    [Fact]
+    public void Get_Total_Priorities_Of_Group_Badges_In_My_Input()
+    {
+        var rucksackLines = File.ReadAllLines(@"TestData\MyInput.txt"); 
+        new Rucksack().GetTotalPrioritiesOfGroupBadges(rucksackLines).Should().Be(2515);
+    }
 }
