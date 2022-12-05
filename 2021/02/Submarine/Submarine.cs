@@ -11,6 +11,13 @@ public class Submarine
         return position.Horizontal * position.Depth;
     }
 
+    public int GetHorizontalPositionMultipliedByDepthUsingAim(string[] inputLines)
+    {
+        var commands = ParseCommands(inputLines);
+        var position = ProcessCommandsUsingAim(commands);
+        return position.Horizontal * position.Depth;
+    }
+
     private IEnumerable<Command> ParseCommands(string[] inputLines)
     {
         var textInfo = CultureInfo.CurrentCulture.TextInfo;
@@ -39,6 +46,32 @@ public class Submarine
                     break;
                 case Movement.Up:
                     position.Depth -= command.Amount;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        return position;
+    }
+    
+    private Position ProcessCommandsUsingAim(IEnumerable<Command> commands)
+    {
+        Position position = new();
+
+        foreach (var command in commands)
+        {
+            switch (command.Movement)
+            {
+                case Movement.Down:
+                    position.Aim += command.Amount;
+                    break;
+                case Movement.Forward:
+                    position.Horizontal += command.Amount;
+                    position.Depth += position.Aim * command.Amount;
+                    break;
+                case Movement.Up:
+                    position.Aim -= command.Amount;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
