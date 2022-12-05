@@ -1,7 +1,34 @@
+using System.Text.RegularExpressions;
+
 namespace CrateMover;
 
 public class CrateMover
 {
+    public string MoveStacks(string[] inputLines)
+    {
+        var stacks = ParseStacks(inputLines).ToList();
+        var moves = ParseMoves(inputLines);
+
+        foreach (var move in moves)
+        {
+            var quantity = move.Quantity;
+            var source = stacks.First(x => x.Number == move.SourceStackNumber);
+            var destination = stacks.First(x => x.Number == move.DestinationStackNumber);
+            while (quantity > 0)
+            {
+                var crate = source.Crates.Pop();
+                destination.Crates.Push(crate);
+                quantity--;
+            }
+        }
+
+        var tops = stacks
+            .Select(x => x.Crates.Peek())
+            .ToArray();
+
+        return new string(tops);
+    }
+
     public IEnumerable<CrateStack> ParseStacks(string[] inputLines)
     {
         var stacksLines = inputLines
@@ -9,14 +36,17 @@ public class CrateMover
             .ToList();
         stacksLines.Reverse();
 
-        List<CrateStack> stacks = CreateStacks(stacksLines[0]);
+        var stacks = CreateStacks(stacksLines[0]);
         for (var index = 1; index < stacksLines.Count; index++)
         {
             var line = stacksLines[index];
             for (var stackIndex = 0; stackIndex < stacks.Count; stackIndex++)
             {
                 var lineChar = GetStackCharacter(line, stackIndex);
-                stacks[stackIndex].Crates.Push(lineChar);
+                if (char.IsLetter(lineChar))
+                {
+                    stacks[stackIndex].Crates.Push(lineChar);   
+                }
             }
         }
 
@@ -26,6 +56,22 @@ public class CrateMover
     public char GetStackCharacter(string inputLine, int stackIndex)
     {
         return inputLine[stackIndex * 4 + 1];
+    }
+
+    public IEnumerable<CrateMove> ParseMoves(string[] inputLines)
+    {
+        var movesLines = inputLines
+            .SkipWhile(inputLine => !string.IsNullOrWhiteSpace(inputLine))
+            .Skip(1)
+            .ToList();
+        
+        return movesLines
+            .Select(inputLine => Regex.Matches(inputLine, @"\d+"))
+            .Select(numbers => new CrateMove(
+                Convert.ToInt32(numbers[0].Value), 
+                Convert.ToInt32(numbers[1].Value), 
+                Convert.ToInt32(numbers[2].Value)))
+            .ToList();
     }
 
     private List<CrateStack> CreateStacks(string stackNumberLine)
