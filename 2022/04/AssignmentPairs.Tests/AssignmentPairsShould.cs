@@ -31,4 +31,17 @@ public class AssignmentPairsShould
         actual.Start.Should().Be(expectedStart);
         actual.End.Should().Be(expectedEnd);
     }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 4)]
+    [InlineData("MyInput.txt", 936)]
+    public void Determine_How_Many_Pairs_Overlap(
+        string inputFile, 
+        int expectedNumberOfPairs)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        var sut = new AssignmentPairs();
+        
+        sut.GetNumberOfPairsThatOverlap(inputLines).Should().Be(expectedNumberOfPairs);
+    }
 }

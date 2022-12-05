@@ -5,10 +5,9 @@ public class AssignmentPairs
     public int GetNumberOfPairsWhereOneRangeFullyCoversTheOther(string[] inputLines)
     {
         var rangePairs = ParseLines(inputLines);
-        return rangePairs
-            .Count(rangePair => 
-                (rangePair.Range1.Start >= rangePair.Range2.Start && rangePair.Range1.End <= rangePair.Range2.End) || 
-                (rangePair.Range2.Start >= rangePair.Range1.Start && rangePair.Range2.End <= rangePair.Range1.End));
+        return rangePairs.Count(rangePair => 
+            (rangePair.Range1.Start >= rangePair.Range2.Start && rangePair.Range1.End <= rangePair.Range2.End) || 
+            (rangePair.Range2.Start >= rangePair.Range1.Start && rangePair.Range2.End <= rangePair.Range1.End));
     }
 
     public Range ParseRange(string range)
@@ -18,6 +17,14 @@ public class AssignmentPairs
         var end = Convert.ToInt32(rangeLimits[1]);
         
         return new Range(start, end);
+    }
+
+    public int GetNumberOfPairsThatOverlap(string[] inputLines)
+    {
+        var rangePairs = ParseLines(inputLines);
+        return rangePairs.Count(rangePair => 
+            rangePair.Range1.End >= rangePair.Range2.Start && 
+            rangePair.Range1.Start <= rangePair.Range2.End);
     }
 
     private IEnumerable<(Range Range1, Range Range2)> ParseLines(string[] inputLines)
