@@ -4,7 +4,7 @@ namespace CrateMover;
 
 public class CrateMover
 {
-    public string MoveStacks(string[] inputLines)
+    public string MoveCratesSingle(string[] inputLines)
     {
         var stacks = ParseStacks(inputLines).ToList();
         var moves = ParseMoves(inputLines);
@@ -19,6 +19,38 @@ public class CrateMover
                 var crate = source.Crates.Pop();
                 destination.Crates.Push(crate);
                 quantity--;
+            }
+        }
+
+        var tops = stacks
+            .Select(x => x.Crates.Peek())
+            .ToArray();
+
+        return new string(tops);
+    }
+    
+    public string MoveCratesMultiple(string[] inputLines)
+    {
+        var stacks = ParseStacks(inputLines).ToList();
+        var moves = ParseMoves(inputLines);
+
+        foreach (var move in moves)
+        {
+            var quantity = move.Quantity;
+            var source = stacks.First(x => x.Number == move.SourceStackNumber);
+            var destination = stacks.First(x => x.Number == move.DestinationStackNumber);
+
+            List<char> crates = new(); 
+            while (quantity > 0)
+            {
+                crates.Add(source.Crates.Pop());
+                quantity--;
+            }
+            crates.Reverse();
+
+            foreach (var crate in crates)
+            {
+                destination.Crates.Push(crate);   
             }
         }
 

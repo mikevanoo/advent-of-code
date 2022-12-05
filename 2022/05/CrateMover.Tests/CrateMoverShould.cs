@@ -93,11 +93,22 @@ public class CrateMoverShould
     [Theory]
     [InlineData("SampleInput.txt", "CMZ")]
     [InlineData("MyInput.txt", "DHBJQJCCW")]
-    public void Get_Tops_Of_Stacks_After_Moves(
+    public void Get_Tops_Of_Stacks_After_Crates_Are_Moved_One_At_A_Time(
         string inputFile,
         string expectedTopsOfStacks)
     {
         var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
-        new CrateMover().MoveStacks(inputLines).Should().BeEquivalentTo(expectedTopsOfStacks);
+        new CrateMover().MoveCratesSingle(inputLines).Should().BeEquivalentTo(expectedTopsOfStacks);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", "MCD")]
+    [InlineData("MyInput.txt", "WJVRLSJJT")]
+    public void Get_Tops_Of_Stacks_After_Crates_Are_Moved_Many_At_A_Time(
+        string inputFile,
+        string expectedTopsOfStacks)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        new CrateMover().MoveCratesMultiple(inputLines).Should().BeEquivalentTo(expectedTopsOfStacks);
     }
 }
