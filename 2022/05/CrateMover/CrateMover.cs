@@ -2,63 +2,42 @@ using System.Text.RegularExpressions;
 
 namespace CrateMover;
 
-public class CrateMover
+public partial class CrateMover
 {
     public string MoveCratesSingle(string[] inputLines)
     {
-        var stacks = ParseStacks(inputLines).ToList();
-        var moves = ParseMoves(inputLines);
-
-        foreach (var move in moves)
-        {
-            var quantity = move.Quantity;
-            var source = stacks.First(x => x.Number == move.SourceStackNumber);
-            var destination = stacks.First(x => x.Number == move.DestinationStackNumber);
-            while (quantity > 0)
+        return MoveCrates(
+            inputLines,
+            (quantity, source, destination) =>
             {
-                var crate = source.Crates.Pop();
-                destination.Crates.Push(crate);
-                quantity--;
-            }
-        }
-
-        var tops = stacks
-            .Select(x => x.Crates.Peek())
-            .ToArray();
-
-        return new string(tops);
+                while (quantity > 0)
+                {
+                    var crate = source.Crates.Pop();
+                    destination.Crates.Push(crate);
+                    quantity--;
+                }
+            });
     }
     
     public string MoveCratesMultiple(string[] inputLines)
     {
-        var stacks = ParseStacks(inputLines).ToList();
-        var moves = ParseMoves(inputLines);
-
-        foreach (var move in moves)
-        {
-            var quantity = move.Quantity;
-            var source = stacks.First(x => x.Number == move.SourceStackNumber);
-            var destination = stacks.First(x => x.Number == move.DestinationStackNumber);
-
-            List<char> crates = new(); 
-            while (quantity > 0)
+        return MoveCrates(
+            inputLines, 
+            (quantity, source, destination) =>
             {
-                crates.Add(source.Crates.Pop());
-                quantity--;
-            }
-            crates.Reverse();
+                List<char> crates = new();
+                while (quantity > 0)
+                {
+                    crates.Add(source.Crates.Pop());
+                    quantity--;
+                }
+                crates.Reverse();
 
-            foreach (var crate in crates)
-            {
-                destination.Crates.Push(crate);   
-            }
-        }
-
-        var tops = stacks
-            .Select(x => x.Crates.Peek())
-            .ToArray();
-
-        return new string(tops);
+                foreach (var crate in crates)
+                {
+                    destination.Crates.Push(crate);
+                }
+            });
     }
 
     public IEnumerable<CrateStack> ParseStacks(string[] inputLines)
@@ -90,6 +69,9 @@ public class CrateMover
         return inputLine[stackIndex * 4 + 1];
     }
 
+    [GeneratedRegex("\\d+")]
+    private static partial Regex GetNumbersRegex();
+
     public IEnumerable<CrateMove> ParseMoves(string[] inputLines)
     {
         var movesLines = inputLines
@@ -98,7 +80,7 @@ public class CrateMover
             .ToList();
         
         return movesLines
-            .Select(inputLine => Regex.Matches(inputLine, @"\d+"))
+            .Select(inputLine => GetNumbersRegex().Matches(inputLine))
             .Select(numbers => new CrateMove(
                 Convert.ToInt32(numbers[0].Value), 
                 Convert.ToInt32(numbers[1].Value), 
@@ -115,5 +97,26 @@ public class CrateMover
                 Number = (int)char.GetNumericValue(x)
             })
             .ToList();
+    }
+
+    private string MoveCrates(
+        string[] inputLines, 
+        Action<int, CrateStack, CrateStack> mover)
+    {
+        var stacks = ParseStacks(inputLines).ToList();
+        var moves = ParseMoves(inputLines);
+
+        foreach (var move in moves)
+        {
+            var source = stacks.First(x => x.Number == move.SourceStackNumber);
+            var destination = stacks.First(x => x.Number == move.DestinationStackNumber);
+            mover(move.Quantity, source, destination);
+        }
+
+        var tops = stacks
+            .Select(x => x.Crates.Peek())
+            .ToArray();
+
+        return new string(tops);
     }
 }
