@@ -34,4 +34,35 @@ public class SubmarineShould
         var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
         new Submarine().GetPowerConsumption(inputLines).Should().Be(expectedPowerConsumption);
     }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 23)]
+    public void Get_The_Oxygen_Generator_Rating(
+        string inputFile, 
+        int expectedRate)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        new Submarine().GetOxygenGeneratorRating(inputLines).Should().Be(expectedRate);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 10)]
+    public void Get_The_Co2_Scrubber_Rating(
+        string inputFile, 
+        int expectedRate)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        new Submarine().GetCo2ScrubberRating(inputLines).Should().Be(expectedRate);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 230)]
+    [InlineData("MyInput.txt", 2981085)]
+    public void Get_Life_Support_Rating(
+        string inputFile, 
+        int expectedRate)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        new Submarine().GetLifeSupportRating(inputLines).Should().Be(expectedRate);
+    }
 }

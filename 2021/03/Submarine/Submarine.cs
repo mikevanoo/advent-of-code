@@ -4,8 +4,7 @@ public class Submarine
 {
     public int GetPowerConsumption(string[] inputLines)
     {
-        var input = ParseInput(inputLines);
-        var mostCommonValues = GetMostCommonValuesByColumn(input);
+        var mostCommonValues = GetMostCommonValuesByColumn(inputLines);
         var gammaRate = GetGammaRate(mostCommonValues);
         var epsilonRate = GetEpsilonRate(mostCommonValues);
 
@@ -14,51 +13,108 @@ public class Submarine
 
     public int GetGammaRate(string[] inputLines)
     {
-        var input = ParseInput(inputLines);
-        var mostCommonValues = GetMostCommonValuesByColumn(input);
+        var mostCommonValues = GetMostCommonValuesByColumn(inputLines);
 
         return GetGammaRate(mostCommonValues);
     }
     
     public int GetEpsilonRate(string[] inputLines)
     {
-        var input = ParseInput(inputLines);
-        var mostCommonValues = GetMostCommonValuesByColumn(input);
+        var mostCommonValues = GetMostCommonValuesByColumn(inputLines);
 
         return GetEpsilonRate(mostCommonValues);
     }
-    
-    private List<List<int>> ParseInput(string[] inputLines)
+
+    public int GetLifeSupportRating(string[] inputLines)
     {
-        var rowCount = inputLines.Length;
-        var columnCount = inputLines[0].Length;
-        var binaries = new List<List<int>>(columnCount);
-    
-        for (var columnIndex = 0; columnIndex < columnCount; columnIndex++)
+        return GetOxygenGeneratorRating(inputLines) * GetCo2ScrubberRating(inputLines);
+    }
+
+    public int GetOxygenGeneratorRating(string[] inputLines)
+    {
+        for (var columnIndex = 0; columnIndex < inputLines[0].Length; columnIndex++)
         {
-            var column = new List<int>(rowCount);
-            for (var rowIndex = 0; rowIndex < rowCount; rowIndex++)
+            var moreOrLessZeros = MoreOrLessZerosAtPosition(inputLines, columnIndex);
+            var mostCommonValue = moreOrLessZeros == MoreOrLessZeros.MoreZero ? '0' : '1';
+            inputLines = inputLines
+                .Where(line => line[columnIndex] == mostCommonValue)
+                .ToArray();
+
+            if (inputLines.Length == 1)
             {
-                column.Add(inputLines[rowIndex][columnIndex] == '1' ? 1 : 0);
+                break;
             }
-            binaries.Add(column);
         }
 
-        return binaries;
+        return ConvertBinaryToInt32(string.Join(string.Empty, inputLines[0]));
     }
-    
-    private List<int> GetMostCommonValuesByColumn(List<List<int>> input)
+
+    public int GetCo2ScrubberRating(string[] inputLines)
     {
-        return input
-            .Select(column => FindMostCommonValue(column.ToList()))
+        for (var columnIndex = 0; columnIndex < inputLines[0].Length; columnIndex++)
+        {
+            var moreOrLessZeros = MoreOrLessZerosAtPosition(inputLines, columnIndex);
+            var leastCommonValue = moreOrLessZeros == MoreOrLessZeros.MoreZero ? '1' : '0';
+            inputLines = inputLines
+                .Where(line => line[columnIndex] == leastCommonValue)
+                .ToArray();
+
+            if (inputLines.Length == 1)
+            {
+                break;
+            }
+        }
+
+        return ConvertBinaryToInt32(string.Join(string.Empty, inputLines[0]));
+    }
+
+    private List<int> GetMostCommonValuesByColumn(string[] inputLines)
+    {
+        List<MoreOrLessZeros> results = new();
+        for (var index = 0; index < inputLines[0].Length; index++)
+        {
+            results.Add(MoreOrLessZerosAtPosition(inputLines, index));
+        }
+
+        return results
+            .Select(x => x == MoreOrLessZeros.MoreZero ? 0 : 1)
             .ToList();
     }
 
-    private int FindMostCommonValue(List<int> column)
+    private MoreOrLessZeros MoreOrLessZerosAtPosition(string[] inputLines, int index)
     {
-        var oneCount = column.Sum();
-        var zeroCount = column.Count - oneCount;
-        return oneCount > zeroCount ? 1 : 0;
+        var zeroCount = 0;
+        var oneCount = 0;
+        foreach (var input in inputLines)
+        {
+            if (input[index] == '0')
+            {
+                zeroCount++;
+            }
+            else
+            {
+                oneCount++;
+            }
+        }
+
+        if (zeroCount == oneCount)
+        {
+            return MoreOrLessZeros.Equal;
+        }
+
+        if (zeroCount > oneCount)
+        {
+            return MoreOrLessZeros.MoreZero;
+        }
+
+        return MoreOrLessZeros.LessZero;
+    }
+
+    private enum MoreOrLessZeros
+    {
+        MoreZero,
+        Equal,
+        LessZero
     }
 
     private int GetGammaRate(List<int> mostCommonValues)
