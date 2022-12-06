@@ -26,6 +26,7 @@ public class SubmarineShould
     
     [Theory]
     [InlineData("SampleInput.txt", 198)]
+    [InlineData("MyInput.txt", 3309596)]
     public void Get_PowerConsumption(
         string inputFile, 
         int expectedPowerConsumption)
