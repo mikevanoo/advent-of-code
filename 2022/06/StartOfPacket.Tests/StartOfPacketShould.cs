@@ -10,6 +10,7 @@ public class StartOfPacketShould
     [InlineData("SampleInput3.txt", 6)]
     [InlineData("SampleInput4.txt", 10)]
     [InlineData("SampleInput5.txt", 11)]
+    [InlineData("MyInput.txt", 1542)]
     public void Get_The_Number_Of_Characters_Read_To_Complete_The_Start_Of_Packet_Marker(
         string inputFile,
         int expectedNumberOfCharacters)
