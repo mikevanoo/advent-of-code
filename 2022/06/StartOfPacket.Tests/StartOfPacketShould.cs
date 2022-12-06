@@ -18,4 +18,19 @@ public class StartOfPacketShould
         var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
         new StartOfPacket().CharactersReadAtEndOfStartOfPacketMarker(inputLines[0]).Should().Be(expectedNumberOfCharacters);
     }
+    
+    [Theory]
+    [InlineData("SampleInput1.txt", 19)]
+    [InlineData("SampleInput2.txt", 23)]
+    [InlineData("SampleInput3.txt", 23)]
+    [InlineData("SampleInput4.txt", 29)]
+    [InlineData("SampleInput5.txt", 26)]
+    [InlineData("MyInput.txt", 3153)]
+    public void Get_The_Number_Of_Characters_Read_To_Complete_The_Start_Of_Message_Marker(
+        string inputFile,
+        int expectedNumberOfCharacters)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        new StartOfPacket().CharactersReadAtEndOfStartOfMessageMarker(inputLines[0]).Should().Be(expectedNumberOfCharacters);
+    }
 }
