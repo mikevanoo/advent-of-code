@@ -31,9 +31,17 @@ public class Terminal
             else
             {
                var item = ParseListCommandOutputLine(inputLine);
-               if (item.HasValue)
+               if (item != null)
                {
-                   CurrentDirectory.AddChild(item.Value);
+                   CurrentDirectory.AddChild(item);
+                   
+                   // update directory sizes
+                   var current = CurrentDirectory;
+                   do
+                   {
+                       current.Value.IncreaseSize(item.Size);
+                       current = current.Parent;
+                   } while (current != null);
                }
             }
         }

@@ -49,9 +49,9 @@ public class TerminalShould
     {
         var actual = new Terminal().ParseListCommandOutputLine(inputLine);
         actual.Should().NotBeNull();
-        actual!.Value.Type.Should().Be(expectedType);
-        actual!.Value.Name.Should().Be(expectedName);
-        actual!.Value.Size.Should().Be(expectedSize);
+        actual!.Type.Should().Be(expectedType);
+        actual!.Name.Should().Be(expectedName);
+        actual!.Size.Should().Be(expectedSize);
     }
     
     [Theory]
@@ -87,5 +87,22 @@ public class TerminalShould
         var expectedOutput = File.ReadAllText(@"TestData\SampleInput_FileSystemOutput.txt");
         var actual = sut.PrintFileSystem();
         actual.Should().BeEquivalentTo(expectedOutput);
+    }
+    
+    [Theory]
+    [InlineData("e", 584)]
+    [InlineData("a", 94853)]
+    [InlineData("d", 24933642)]
+    [InlineData("/", 48381165)]
+    public void Get_Directory_Sizes_From_SampleInput(string name, int expectedSize)
+    {
+        var inputLines = File.ReadAllLines(@"TestData\SampleInput.txt");
+        
+        var sut = new Terminal();
+        sut.ParseInput(inputLines);
+
+        var allItems = sut.FileSystem.Flatten();
+        allItems.First(x => x.Type == ItemType.Directory && x.Name == name)
+            .Size.Should().Be(expectedSize);
     }
 }
