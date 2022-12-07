@@ -109,7 +109,7 @@ public class TerminalShould
     [Theory]
     [InlineData("SampleInput.txt", 95437)]
     [InlineData("MyInput.txt", 1334506)]
-    public void Get_Total_Directory_Sizes_Over_100_000(string inputFile, int expectedSize)
+    public void Get_Total_Directory_Sizes_With_Max_Size_Of_100_000(string inputFile, int expectedSize)
     {
         var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
         
@@ -117,5 +117,49 @@ public class TerminalShould
         sut.ParseInput(inputLines);
 
         sut.GetTotalDirectorySizesWithMaxSizeOf(100_000).Should().Be(expectedSize);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 48_381_165)]
+    [InlineData("MyInput.txt", 46_975_962)]
+    public void Get_Total_Directory_Size(string inputFile, int expectedSize)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        
+        var sut = new Terminal();
+        sut.ParseInput(inputLines);
+
+        sut.GetTotalDirectorySize().Should().Be(expectedSize);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 21_618_835)]
+    [InlineData("MyInput.txt", 23_024_038)]
+    public void Get_Free_Space_Size(string inputFile, int expectedSize)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        
+        var sut = new Terminal();
+        sut.ParseInput(inputLines);
+
+        sut.GetFreeSpaceSize().Should().Be(expectedSize);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", "d", 24_933_642)]
+    [InlineData("MyInput.txt", "ptzptl", 7_421_137)]
+    public void Get_The_Smallest_Directory_To_Delete_To_Achieve_Desired_Free_Space(
+        string inputFile,
+        string expectedDirectoryName,
+        int expectedDirectorySize)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        
+        var sut = new Terminal();
+        sut.ParseInput(inputLines);
+
+        var actual = sut.GetSmallestDirectoryToDeleteToAchieveFreeSpaceOf(30_000_000);
+        actual.Name.Should().Be(expectedDirectoryName);
+        actual.Size.Should().Be(expectedDirectorySize);
     }
 }

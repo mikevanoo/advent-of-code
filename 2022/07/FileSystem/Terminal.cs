@@ -4,16 +4,16 @@ namespace FileSystem;
 
 public class Terminal
 {
-    private Item _rootItem;
+    private const int FileSystemCapacity = 70_000_000;
+    private const string RootDirectoryName = "/";
     
     public TreeNode<Item> CurrentDirectory { get; private set; }
-
     public TreeNode<Item> FileSystem { get; private set; }
 
     public Terminal()
     {
-        _rootItem = new Item(ItemType.Directory, "/", 0);
-        FileSystem = new TreeNode<Item>(_rootItem);
+        var rootItem = new Item(ItemType.Directory, RootDirectoryName, 0);
+        FileSystem = new TreeNode<Item>(rootItem);
         CurrentDirectory = FileSystem;
     }
 
@@ -74,7 +74,7 @@ public class Terminal
         Command? command = cmd switch
         {
             "cd" when arg == ".." => new Command(CommandType.ChangeToParentDirectory, null),
-            "cd" when arg == "/" => new Command(CommandType.ChangeToRootDirectory, null),
+            "cd" when arg == RootDirectoryName => new Command(CommandType.ChangeToRootDirectory, null),
             "cd" => new Command(CommandType.ChangeDirectory, arg),
             "ls" => new Command(CommandType.List, null),
             _ => null
@@ -136,9 +136,31 @@ public class Terminal
     {
         return FileSystem.Flatten()
             .Where(x => 
-                x.Name != "/" &&
+                x.Name != RootDirectoryName &&
                 x.Type == ItemType.Directory && 
                 x.Size <= size)
             .Sum(x => x.Size);
+    }
+
+    public int GetTotalDirectorySize()
+    {
+        return FileSystem.Value.Size;
+    }
+    
+    public int GetFreeSpaceSize()
+    {
+        return FileSystemCapacity - FileSystem.Value.Size;
+    }
+
+    public Item GetSmallestDirectoryToDeleteToAchieveFreeSpaceOf(int desiredFreeSpace)
+    {
+        var requiredDirectorySize = desiredFreeSpace - GetFreeSpaceSize();
+        
+        return FileSystem.Flatten()
+            .Where(x =>
+                x.Type == ItemType.Directory &&
+                x.Size >= requiredDirectorySize)
+            .OrderBy(x => x.Size)
+            .First();
     }
 }
