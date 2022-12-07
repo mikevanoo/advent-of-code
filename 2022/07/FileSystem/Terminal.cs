@@ -7,6 +7,7 @@ public class Terminal
     private Item _rootItem;
     
     public TreeNode<Item> CurrentDirectory { get; private set; }
+
     public TreeNode<Item> FileSystem { get; private set; }
 
     public Terminal()
@@ -129,5 +130,15 @@ public class Terminal
                 // do nothing for any other commands
                 break;
         }
+    }
+
+    public int GetTotalDirectorySizesWithMaxSizeOf(int size)
+    {
+        return FileSystem.Flatten()
+            .Where(x => 
+                x.Name != "/" &&
+                x.Type == ItemType.Directory && 
+                x.Size <= size)
+            .Sum(x => x.Size);
     }
 }

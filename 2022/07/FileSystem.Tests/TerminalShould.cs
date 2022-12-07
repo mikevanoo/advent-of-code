@@ -105,4 +105,17 @@ public class TerminalShould
         allItems.First(x => x.Type == ItemType.Directory && x.Name == name)
             .Size.Should().Be(expectedSize);
     }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 95437)]
+    [InlineData("MyInput.txt", 1334506)]
+    public void Get_Total_Directory_Sizes_Over_100_000(string inputFile, int expectedSize)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        
+        var sut = new Terminal();
+        sut.ParseInput(inputLines);
+
+        sut.GetTotalDirectorySizesWithMaxSizeOf(100_000).Should().Be(expectedSize);
+    }
 }
