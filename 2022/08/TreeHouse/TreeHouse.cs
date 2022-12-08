@@ -1,3 +1,5 @@
+using System.ComponentModel.Design;
+
 namespace TreeHouse;
 
 public class TreeHouse
@@ -74,11 +76,29 @@ public class TreeHouse
             for (var columnIndex = 0; columnIndex < _columnSize; columnIndex++)
             {
                 // visibility
+                var height = Map[rowIndex][columnIndex].Height;
                 var visible = IsEdgeTree(rowIndex, columnIndex);
-                visible = IsVisibleUp(rowIndex, columnIndex, visible);
-                visible = IsVisibleLeft(rowIndex, columnIndex, visible);
-                visible = IsVisibleDown(rowIndex, columnIndex, visible);
-                visible = IsVisibleRight(rowIndex, columnIndex, visible);
+                if (!visible)
+                {
+                    var treesUp = GetTreesFromTargetToEdge(0, columnIndex, rowIndex - 1, columnIndex, true);
+                    visible = treesUp.All(x => x.Height < height);
+                }
+                if (!visible)
+                {
+                    var treesLeft = GetTreesFromTargetToEdge(rowIndex, 0, rowIndex, columnIndex - 1, true);
+                    visible = treesLeft.All(x => x.Height < height);
+                }
+                if (!visible)
+                {
+                    var treesDown = GetTreesFromTargetToEdge(rowIndex + 1, columnIndex, _rowSize - 1, columnIndex, false);
+                    visible = treesDown.All(x => x.Height < height);
+                }
+                if (!visible)
+                {
+                    var treesRight = GetTreesFromTargetToEdge(rowIndex, columnIndex + 1, rowIndex, _columnSize - 1, false);
+                    visible = treesRight.All(x => x.Height < height);
+                }
+                
                 Map[rowIndex][columnIndex].Visible = visible;
                 
                 // scenic score
@@ -100,94 +120,29 @@ public class TreeHouse
                columnIndex == _columnSize - 1;
     }
 
-    private bool IsVisibleUp(int rowIndex, int columnIndex, bool isAlreadyVisible)
+    private IEnumerable<Tree> GetTreesFromTargetToEdge(
+        int startRowIndex, int startColumnIndex,
+        int endRowIndex, int endColumnIndex,
+        bool reverse)
     {
-        if (isAlreadyVisible)
+        List<Tree> trees = new();
+
+        for (var rowIndex = startRowIndex; rowIndex <= endRowIndex; rowIndex++)
         {
-            return isAlreadyVisible;
+            for (var columnIndex = startColumnIndex; columnIndex <= endColumnIndex; columnIndex++)
+            {
+                trees.Add(Map[rowIndex][columnIndex]);
+            }
+        }
+
+        if (reverse)
+        {
+            trees.Reverse();
         }
         
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = rowIndex - 1;
-
-        while (indexToCheck >= 0)
-        {
-            if (Map[indexToCheck][columnIndex].Height >= height)
-            {
-                return false;
-            }
-            indexToCheck--;
-        }
-
-        return true;
+        return trees;
     }
-
-    private bool IsVisibleLeft(int rowIndex, int columnIndex, bool isAlreadyVisible)
-    {
-        if (isAlreadyVisible)
-        {
-            return isAlreadyVisible;
-        }
-        
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = columnIndex - 1;
-
-        while (indexToCheck >= 0)
-        {
-            if (Map[rowIndex][indexToCheck].Height >= height)
-            {
-                return false;
-            }
-            indexToCheck--;
-        }
-
-        return true;
-    }
-
-    private bool IsVisibleDown(int rowIndex, int columnIndex, bool isAlreadyVisible)
-    {
-        if (isAlreadyVisible)
-        {
-            return isAlreadyVisible;
-        }
-        
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = rowIndex + 1;
-
-        while (indexToCheck < _rowSize)
-        {
-            if (Map[indexToCheck][columnIndex].Height >= height)
-            {
-                return false;
-            }
-            indexToCheck++;
-        }
-
-        return true;
-    }
-
-    private bool IsVisibleRight(int rowIndex, int columnIndex, bool isAlreadyVisible)
-    {
-        if (isAlreadyVisible)
-        {
-            return isAlreadyVisible;
-        }
-        
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = columnIndex + 1;
-
-        while (indexToCheck < _columnSize)
-        {
-            if (Map[rowIndex][indexToCheck].Height >= height)
-            {
-                return false;
-            }
-            indexToCheck++;
-        }
-
-        return true;
-    }
-
+    
     private int GetScenicScoreUp(int rowIndex, int columnIndex)
     {
         var treeCount = 0;
