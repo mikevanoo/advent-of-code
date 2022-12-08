@@ -75,38 +75,25 @@ public class TreeHouse
         {
             for (var columnIndex = 0; columnIndex < _columnSize; columnIndex++)
             {
-                // visibility
                 var height = Map[rowIndex][columnIndex].Height;
-                var visible = IsEdgeTree(rowIndex, columnIndex);
-                if (!visible)
-                {
-                    var treesUp = GetTreesFromTargetToEdge(0, columnIndex, rowIndex - 1, columnIndex, true);
-                    visible = treesUp.All(x => x.Height < height);
-                }
-                if (!visible)
-                {
-                    var treesLeft = GetTreesFromTargetToEdge(rowIndex, 0, rowIndex, columnIndex - 1, true);
-                    visible = treesLeft.All(x => x.Height < height);
-                }
-                if (!visible)
-                {
-                    var treesDown = GetTreesFromTargetToEdge(rowIndex + 1, columnIndex, _rowSize - 1, columnIndex, false);
-                    visible = treesDown.All(x => x.Height < height);
-                }
-                if (!visible)
-                {
-                    var treesRight = GetTreesFromTargetToEdge(rowIndex, columnIndex + 1, rowIndex, _columnSize - 1, false);
-                    visible = treesRight.All(x => x.Height < height);
-                }
+                var treesUp = GetTreesFromTargetToEdge(0, columnIndex, rowIndex - 1, columnIndex, true);
+                var treesLeft = GetTreesFromTargetToEdge(rowIndex, 0, rowIndex, columnIndex - 1, true);
+                var treesDown = GetTreesFromTargetToEdge(rowIndex + 1, columnIndex, _rowSize - 1, columnIndex, false);
+                var treesRight = GetTreesFromTargetToEdge(rowIndex, columnIndex + 1, rowIndex, _columnSize - 1, false);
                 
+                // visibility
+                var visible = IsEdgeTree(rowIndex, columnIndex);
+                if (!visible) visible = treesUp.All(x => x.Height < height);
+                if (!visible) visible = treesLeft.All(x => x.Height < height);
+                if (!visible) visible = treesDown.All(x => x.Height < height);
+                if (!visible) visible = treesRight.All(x => x.Height < height);
                 Map[rowIndex][columnIndex].Visible = visible;
                 
                 // scenic score
-                var scenicScoreUp = GetScenicScoreUp(rowIndex, columnIndex);
-                var scenicScoreLeft = GetScenicScoreLeft(rowIndex, columnIndex);
-                var scenicScoreDown = GetScenicScoreDown(rowIndex, columnIndex);
-                var scenicScoreRight = GetScenicScoreRight(rowIndex, columnIndex);
-                
+                var scenicScoreUp = GetScenicScoreInOneDirection(treesUp, height);
+                var scenicScoreLeft = GetScenicScoreInOneDirection(treesLeft, height);
+                var scenicScoreDown = GetScenicScoreInOneDirection(treesDown, height);
+                var scenicScoreRight = GetScenicScoreInOneDirection(treesRight, height);
                 Map[rowIndex][columnIndex].ScenicScore = scenicScoreUp * scenicScoreLeft * scenicScoreDown * scenicScoreRight;
             }
         }
@@ -120,7 +107,7 @@ public class TreeHouse
                columnIndex == _columnSize - 1;
     }
 
-    private IEnumerable<Tree> GetTreesFromTargetToEdge(
+    private List<Tree> GetTreesFromTargetToEdge(
         int startRowIndex, int startColumnIndex,
         int endRowIndex, int endColumnIndex,
         bool reverse)
@@ -143,79 +130,16 @@ public class TreeHouse
         return trees;
     }
     
-    private int GetScenicScoreUp(int rowIndex, int columnIndex)
+    private int GetScenicScoreInOneDirection(List<Tree> trees, int height)
     {
         var treeCount = 0;
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = rowIndex - 1;
-
-        while (indexToCheck >= 0)
+        foreach (var tree in trees)
         {
             treeCount++;
-            if (Map[indexToCheck][columnIndex].Height >= height)
+            if (tree.Height >= height)
             {
                 return treeCount;
             }
-
-            indexToCheck--;
-        }
-
-        return treeCount;
-    }
-
-    private int GetScenicScoreLeft(int rowIndex, int columnIndex)
-    {
-        var treeCount = 0;
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = columnIndex - 1;
-
-        while (indexToCheck >= 0)
-        {
-            treeCount++;
-            if (Map[rowIndex][indexToCheck].Height >= height)
-            {
-                return treeCount;
-            }
-            indexToCheck--;
-        }
-
-        return treeCount;
-    }
-
-    private int GetScenicScoreDown(int rowIndex, int columnIndex)
-    {
-        var treeCount = 0;
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = rowIndex + 1;
-
-        while (indexToCheck < _rowSize)
-        {
-            treeCount++;
-            if (Map[indexToCheck][columnIndex].Height >= height)
-            {
-                return treeCount;
-            }
-            indexToCheck++;
-        }
-
-        return treeCount;
-    }
-
-
-    private int GetScenicScoreRight(int rowIndex, int columnIndex)
-    {
-        var treeCount = 0;
-        var height = Map[rowIndex][columnIndex].Height;
-        var indexToCheck = columnIndex + 1;
-
-        while (indexToCheck < _columnSize)
-        {
-            treeCount++;
-            if (Map[rowIndex][indexToCheck].Height >= height)
-            {
-                return treeCount;
-            }
-            indexToCheck++;
         }
 
         return treeCount;
