@@ -37,9 +37,9 @@ public class TreeHouseShould
         
         // bottom-left 3
         sut.Map[3][1].Visible.Should().BeFalse();
-        // middle-middle 5
+        // bottom-middle 5
         sut.Map[3][2].Visible.Should().BeTrue();
-        // middle-right 4
+        // bottom-right 4
         sut.Map[3][3].Visible.Should().BeFalse();
     }
     
@@ -56,5 +56,35 @@ public class TreeHouseShould
         sut.ParseInput(inputLines);
 
         sut.GetVisibleTreeCount().Should().Be(expectedCount);
+    }
+    
+    [Fact]
+    public void Determine_Tree_Scenic_Score_Of_The_SampleInput()
+    {
+        var inputLines = File.ReadAllLines(@"TestData\SampleInput.txt");
+        
+        var sut = new TreeHouse();
+        sut.ParseInput(inputLines);
+        
+        // top-middle 5
+        sut.Map[1][2].ScenicScore.Should().Be(4);
+        
+        // bottom-middle 5
+        sut.Map[3][2].ScenicScore.Should().Be(8);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 8)]
+    [InlineData("MyInput.txt", 288120)]
+    public void Get_Highest_Scenic_Score(
+        string inputFile,
+        int expectedScore)
+    {
+        var inputLines = File.ReadAllLines(@$"TestData\{inputFile}");
+        
+        var sut = new TreeHouse();
+        sut.ParseInput(inputLines);
+
+        sut.GetHighestScenicScore().Should().Be(expectedScore);
     }
 }

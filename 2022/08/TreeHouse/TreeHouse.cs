@@ -27,7 +27,7 @@ public class TreeHouse
             }
         }
 
-        SetTreeVisibility();
+        SetTreeProperties();
     }
 
     public int GetVisibleTreeCount()
@@ -48,19 +48,46 @@ public class TreeHouse
         return visibleCount;
     }
 
-    private void SetTreeVisibility()
+    public int GetHighestScenicScore()
+    {
+        var highestScore = 0;
+        
+        for (var rowIndex = 0; rowIndex < _rowSize; rowIndex++)
+        {
+            for (var columnIndex = 0; columnIndex < _columnSize; columnIndex++)
+            {
+                var currentScore = Map[rowIndex][columnIndex].ScenicScore;
+                if (currentScore > highestScore)
+                {
+                    highestScore = currentScore;
+                }
+            }
+        }
+
+        return highestScore;
+    }
+
+    private void SetTreeProperties()
     {
         for (var rowIndex = 0; rowIndex < _rowSize; rowIndex++)
         {
             for (var columnIndex = 0; columnIndex < _columnSize; columnIndex++)
             {
+                // visibility
                 var visible = IsEdgeTree(rowIndex, columnIndex);
                 visible = IsVisibleUp(rowIndex, columnIndex, visible);
                 visible = IsVisibleLeft(rowIndex, columnIndex, visible);
                 visible = IsVisibleDown(rowIndex, columnIndex, visible);
                 visible = IsVisibleRight(rowIndex, columnIndex, visible);
-
                 Map[rowIndex][columnIndex].Visible = visible;
+                
+                // scenic score
+                var scenicScoreUp = GetScenicScoreUp(rowIndex, columnIndex);
+                var scenicScoreLeft = GetScenicScoreLeft(rowIndex, columnIndex);
+                var scenicScoreDown = GetScenicScoreDown(rowIndex, columnIndex);
+                var scenicScoreRight = GetScenicScoreRight(rowIndex, columnIndex);
+                
+                Map[rowIndex][columnIndex].ScenicScore = scenicScoreUp * scenicScoreLeft * scenicScoreDown * scenicScoreRight;
             }
         }
     }
@@ -159,5 +186,83 @@ public class TreeHouse
         }
 
         return true;
+    }
+
+    private int GetScenicScoreUp(int rowIndex, int columnIndex)
+    {
+        var treeCount = 0;
+        var height = Map[rowIndex][columnIndex].Height;
+        var indexToCheck = rowIndex - 1;
+
+        while (indexToCheck >= 0)
+        {
+            treeCount++;
+            if (Map[indexToCheck][columnIndex].Height >= height)
+            {
+                return treeCount;
+            }
+
+            indexToCheck--;
+        }
+
+        return treeCount;
+    }
+
+    private int GetScenicScoreLeft(int rowIndex, int columnIndex)
+    {
+        var treeCount = 0;
+        var height = Map[rowIndex][columnIndex].Height;
+        var indexToCheck = columnIndex - 1;
+
+        while (indexToCheck >= 0)
+        {
+            treeCount++;
+            if (Map[rowIndex][indexToCheck].Height >= height)
+            {
+                return treeCount;
+            }
+            indexToCheck--;
+        }
+
+        return treeCount;
+    }
+
+    private int GetScenicScoreDown(int rowIndex, int columnIndex)
+    {
+        var treeCount = 0;
+        var height = Map[rowIndex][columnIndex].Height;
+        var indexToCheck = rowIndex + 1;
+
+        while (indexToCheck < _rowSize)
+        {
+            treeCount++;
+            if (Map[indexToCheck][columnIndex].Height >= height)
+            {
+                return treeCount;
+            }
+            indexToCheck++;
+        }
+
+        return treeCount;
+    }
+
+
+    private int GetScenicScoreRight(int rowIndex, int columnIndex)
+    {
+        var treeCount = 0;
+        var height = Map[rowIndex][columnIndex].Height;
+        var indexToCheck = columnIndex + 1;
+
+        while (indexToCheck < _columnSize)
+        {
+            treeCount++;
+            if (Map[rowIndex][indexToCheck].Height >= height)
+            {
+                return treeCount;
+            }
+            indexToCheck++;
+        }
+
+        return treeCount;
     }
 }
