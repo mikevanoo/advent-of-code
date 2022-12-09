@@ -2,8 +2,11 @@ namespace RopeBridge;
 
 public class Rope
 {
+    private readonly Dictionary<Coordinate, int> _tailPositionsVisited = new();
+    
     public Coordinate HeadPosition { get; private set; }
     public Coordinate TailPosition { get; private set; }
+    public int TailPositionsVisited => _tailPositionsVisited.Count;
 
     public Rope()
         : this(new Coordinate(0, 0), new Coordinate(0, 0))
@@ -19,6 +22,7 @@ public class Rope
     {
         HeadPosition = initialHeadPosition;
         TailPosition = initialTailPosition;
+        RecordTailPosition();
     }
 
     public void Move(string[] moves)
@@ -28,59 +32,45 @@ public class Rope
             Move(move);
         }
     }
-
+    
     public void Move(string move)
     {
         var parsedMove = move.Split(' ');
-        var direction = Enum.Parse<Direction>(parsedMove[0]);
+        var direction = parsedMove[0];
         var steps = Convert.ToInt32(parsedMove[1]);
 
         for (var step = 0; step < steps; step++)
         {
-            HeadPosition.Move(direction);
-
-            var xDelta = HeadPosition.X - TailPosition.X;
-            var yDelta = HeadPosition.Y - TailPosition.Y;
-
-            switch (xDelta)
+            HeadPosition = direction switch
             {
-                case 0 when yDelta == 2:
-                    TailPosition.Move(Direction.U);
-                    break;
-                case 0 when yDelta == -2:
-                    TailPosition.Move(Direction.D);
-                    break;
-                case 2 when yDelta == 0:
-                    TailPosition.Move(Direction.R);
-                    break;
-                case -2 when yDelta == 0:
-                    TailPosition.Move(Direction.L);
-                    break;
-                case 1 when yDelta == 2:
-                    TailPosition.Move(Direction.UR);
-                    break;
-                case 1 when yDelta == -2:
-                    TailPosition.Move(Direction.DR);
-                    break;
-                case -1 when yDelta == 2:
-                    TailPosition.Move(Direction.UL);
-                    break;
-                case -1 when yDelta == -2:
-                    TailPosition.Move(Direction.DL);
-                    break;
-                case 2 when yDelta == 1:
-                    TailPosition.Move(Direction.UR);
-                    break;
-                case 2 when yDelta == -1:
-                    TailPosition.Move(Direction.DR);
-                    break;
-                case -2 when yDelta == 1:
-                    TailPosition.Move(Direction.UL);
-                    break;
-                case -2 when yDelta == -1:
-                    TailPosition.Move(Direction.DL);
-                    break;
+                "R" => new Coordinate(HeadPosition.X + 1, HeadPosition.Y),
+                "L" => new Coordinate(HeadPosition.X - 1, HeadPosition.Y),
+                "U" => new Coordinate(HeadPosition.X, HeadPosition.Y + 1),
+                "D" => new Coordinate(HeadPosition.X, HeadPosition.Y - 1),
+                _ => throw new InvalidOperationException()
+            };
+
+            var deltaX = HeadPosition.X - TailPosition.X;
+            var deltaY = HeadPosition.Y - TailPosition.Y;
+            if (Math.Abs(deltaX) > 1 || Math.Abs(deltaY) > 1)
+            {
+                var newX = TailPosition.X + Math.Sign(deltaX);
+                var newY = TailPosition.Y + Math.Sign(deltaY);
+                TailPosition = new Coordinate(newX, newY);
+                RecordTailPosition();
             }
+        }
+    }
+    
+    private void RecordTailPosition()
+    {
+        if (_tailPositionsVisited.ContainsKey(TailPosition))
+        {
+            _tailPositionsVisited[TailPosition]++;
+        }
+        else
+        {
+            _tailPositionsVisited.Add(TailPosition, 1);
         }
     }
 }

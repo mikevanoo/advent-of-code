@@ -12,7 +12,7 @@ public class RopeShould
         string move,
         int expectedX, int expectedY)
     {
-        var sut = new Rope(new Coordinate(initialX, initialY));
+        var sut = new Rope(new Coordinate(initialX, initialY), new Coordinate(initialX, initialY));
         sut.Move(move);
         sut.HeadPosition.Should().Be(new Coordinate(expectedX, expectedY));
     }
@@ -44,10 +44,28 @@ public class RopeShould
         
         sut.TailPosition.Should().Be(new Coordinate(expectedTailX, expectedTailY));
     }
+
+    [Fact]
+    public void Record_Tail_Positions_Visited()
+    {
+        var sut = new Rope();
+        sut.Move("U 1");
+        sut.TailPositionsVisited.Should().Be(1);
+    }
+    
+    [Fact]
+    public void Not_Record_Repeated_Tail_Positions_Visited()
+    {
+        var sut = new Rope();
+        sut.Move("U 1");
+        sut.TailPositionsVisited.Should().Be(1);
+        sut.Move("D 1");
+        sut.TailPositionsVisited.Should().Be(1);
+    }
     
     [Theory]
     [InlineData("SampleInput.txt", 13)]
-    // [InlineData("MyInput.txt", 6077)]
+    [InlineData("MyInput.txt", 6090)]
     public void Count_Positions_Tail_Visited(
         string inputFile, 
         int expectedCount)
@@ -57,6 +75,6 @@ public class RopeShould
         
         sut.Move(inputLines);
 
-        sut.TailPosition.PositionsVisited.Should().Be(expectedCount);
+        sut.TailPositionsVisited.Should().Be(expectedCount);
     }
 }
