@@ -5,7 +5,7 @@ public class Rope
     private const int HeadIndex = 0;
     
     private readonly List<Coordinate> _knots = new();
-    private readonly Dictionary<Coordinate, int> _tailPositionsVisited = new();
+    private readonly List<Coordinate> _tailPositionsVisited = new();
 
     public Coordinate HeadPosition
     {
@@ -16,18 +16,13 @@ public class Rope
     public Coordinate TailPosition
     {
         get => _knots[^1]; 
-        private set => _knots[^1] = value;
+        private init => _knots[^1] = value;
     }
     
     public int TailPositionsVisited => _tailPositionsVisited.Count;
 
     public Rope(int knotCount)
         : this(knotCount, new Coordinate(0, 0), new Coordinate(0, 0))
-    {
-    }
-    
-    public Rope(int knotCount, Coordinate initialHeadPosition)
-        : this(knotCount, initialHeadPosition, new Coordinate(0, 0))
     {
     }
     
@@ -92,13 +87,9 @@ public class Rope
     
     private void RecordTailPosition()
     {
-        if (_tailPositionsVisited.ContainsKey(TailPosition))
+        if (!_tailPositionsVisited.Contains(TailPosition))
         {
-            _tailPositionsVisited[TailPosition]++;
-        }
-        else
-        {
-            _tailPositionsVisited.Add(TailPosition, 1);
+            _tailPositionsVisited.Add(TailPosition);
         }
     }
 }
