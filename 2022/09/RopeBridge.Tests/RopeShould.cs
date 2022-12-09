@@ -12,7 +12,10 @@ public class RopeShould
         string move,
         int expectedX, int expectedY)
     {
-        var sut = new Rope(new Coordinate(initialX, initialY), new Coordinate(initialX, initialY));
+        var sut = new Rope(
+            knotCount: 2, 
+            initialHeadPosition: new Coordinate(initialX, initialY), 
+            initialTailPosition: new Coordinate(initialX, initialY));
         sut.Move(move);
         sut.HeadPosition.Should().Be(new Coordinate(expectedX, expectedY));
     }
@@ -37,8 +40,9 @@ public class RopeShould
         int expectedTailX, int expectedTailY)
     {
         var sut = new Rope(
-            new Coordinate(initialHeadX, initialHeadY),
-            new Coordinate(initialTailX, initialTailY));
+            knotCount: 2,
+            initialHeadPosition: new Coordinate(initialHeadX, initialHeadY),
+            initialTailPosition: new Coordinate(initialTailX, initialTailY));
         
         sut.Move(move);
         
@@ -48,7 +52,7 @@ public class RopeShould
     [Fact]
     public void Record_Tail_Positions_Visited()
     {
-        var sut = new Rope();
+        var sut = new Rope(knotCount: 2);
         sut.Move("U 1");
         sut.TailPositionsVisited.Should().Be(1);
     }
@@ -56,7 +60,7 @@ public class RopeShould
     [Fact]
     public void Not_Record_Repeated_Tail_Positions_Visited()
     {
-        var sut = new Rope();
+        var sut = new Rope(knotCount: 2);
         sut.Move("U 1");
         sut.TailPositionsVisited.Should().Be(1);
         sut.Move("D 1");
@@ -64,14 +68,17 @@ public class RopeShould
     }
     
     [Theory]
-    [InlineData("SampleInput.txt", 13)]
-    [InlineData("MyInput.txt", 6090)]
+    [InlineData("SampleInput.txt", 2, 13)]
+    [InlineData("MyInput.txt", 2, 6090)]
+    [InlineData("SampleInput2.txt", 10, 36)]
+    [InlineData("MyInput.txt", 10, 2566)]
     public void Count_Positions_Tail_Visited(
         string inputFile, 
+        int knotCount,
         int expectedCount)
     {
         var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
-        var sut = new Rope();
+        var sut = new Rope(knotCount);
         
         sut.Move(inputLines);
 

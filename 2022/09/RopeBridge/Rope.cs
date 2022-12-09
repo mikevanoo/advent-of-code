@@ -2,24 +2,42 @@ namespace RopeBridge;
 
 public class Rope
 {
-    private readonly Dictionary<Coordinate, int> _tailPositionsVisited = new();
+    private const int HeadIndex = 0;
     
-    public Coordinate HeadPosition { get; private set; }
-    public Coordinate TailPosition { get; private set; }
+    private readonly List<Coordinate> _knots = new();
+    private readonly Dictionary<Coordinate, int> _tailPositionsVisited = new();
+
+    public Coordinate HeadPosition
+    {
+        get => _knots[HeadIndex];
+        private set => _knots[HeadIndex] = value;
+    }
+
+    public Coordinate TailPosition
+    {
+        get => _knots[^1]; 
+        private set => _knots[^1] = value;
+    }
+    
     public int TailPositionsVisited => _tailPositionsVisited.Count;
 
-    public Rope()
-        : this(new Coordinate(0, 0), new Coordinate(0, 0))
+    public Rope(int knotCount)
+        : this(knotCount, new Coordinate(0, 0), new Coordinate(0, 0))
     {
     }
     
-    public Rope(Coordinate initialHeadPosition)
-        : this(initialHeadPosition, new Coordinate(0, 0))
+    public Rope(int knotCount, Coordinate initialHeadPosition)
+        : this(knotCount, initialHeadPosition, new Coordinate(0, 0))
     {
     }
     
-    public Rope(Coordinate initialHeadPosition, Coordinate initialTailPosition)
+    public Rope(int knotCount, Coordinate initialHeadPosition, Coordinate initialTailPosition)
     {
+        for (var index = HeadIndex; index < knotCount; index++)
+        {
+            _knots.Add(new Coordinate(0, 0));
+        }
+        
         HeadPosition = initialHeadPosition;
         TailPosition = initialTailPosition;
         RecordTailPosition();
@@ -50,14 +68,24 @@ public class Rope
                 _ => throw new InvalidOperationException()
             };
 
-            var deltaX = HeadPosition.X - TailPosition.X;
-            var deltaY = HeadPosition.Y - TailPosition.Y;
-            if (Math.Abs(deltaX) > 1 || Math.Abs(deltaY) > 1)
+            for (var knotIndex = HeadIndex + 1; knotIndex < _knots.Count; knotIndex++)
             {
-                var newX = TailPosition.X + Math.Sign(deltaX);
-                var newY = TailPosition.Y + Math.Sign(deltaY);
-                TailPosition = new Coordinate(newX, newY);
-                RecordTailPosition();
+                var currentKnot = _knots[knotIndex];
+                var previousKnot = _knots[knotIndex - 1];
+                var deltaX = previousKnot.X - currentKnot.X;
+                var deltaY = previousKnot.Y - currentKnot.Y;
+                
+                if (Math.Abs(deltaX) > 1 || Math.Abs(deltaY) > 1)
+                {
+                    var newX = currentKnot.X + Math.Sign(deltaX);
+                    var newY = currentKnot.Y + Math.Sign(deltaY);
+                    _knots[knotIndex] = new Coordinate(newX, newY);
+                }
+
+                if (knotIndex == _knots.Count - 1)
+                {
+                    RecordTailPosition();
+                }
             }
         }
     }
