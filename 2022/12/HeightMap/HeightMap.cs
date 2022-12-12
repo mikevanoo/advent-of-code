@@ -39,50 +39,106 @@ public class HeightMap
         }
     }
 
-    public void FindNextMove()
+    public int GetFewestStepsToBestSignal()
     {
-        var currentHeight = GetHeightAt(CurrentPosition);
-        
-        var up = GetPossibleMove(0, -1);
-        var down = GetPossibleMove(0, 1);
-        var left = GetPossibleMove(-1, 0);
-        var right = GetPossibleMove(1, 0);
-        
-        List<PossibleMove> possibleMoves = new()
+        var queue = new Queue<Coordinate>();
+        var visited = new Dictionary<Coordinate, Coordinate>();
+
+        var start = new Coordinate(0, 0);
+        visited[start] = start;
+        queue.Enqueue(start);
+
+        while (queue.Count > 0)
         {
-            up,
-            down,
-            left,
-            right
-        };
+            var position = queue.Dequeue();
+            var heightAtPosition = GetHeightAt(position);
+            var neighbours = GetNeighbours(position);
+            foreach (var neighbour in neighbours)
+            {
+                if (neighbour.X < 0 ||
+                    neighbour.X >= _columnCount ||
+                    neighbour.Y < 0 ||
+                    neighbour.Y >= _rowCount ||
+                    visited.ContainsKey(neighbour))
+                {
+                    continue;
+                }
 
-        var moveToMake = possibleMoves
-            .Where(move => move.Height.HasValue && 
-                        move.Height.Value - currentHeight >= 0 &&
-                        !_visited.Contains(move.Position))
-            .OrderByDescending(x => x.Height)
-            .First();
-
-        CurrentPosition = moveToMake.Position;
-    }
-
-    private PossibleMove GetPossibleMove(int xDelta, int yDelta)
-    {
-        var x = CurrentPosition.X + xDelta;
-        var y = CurrentPosition.Y + yDelta;
-        var position = new Coordinate(x, y);
-
-        if (x < 0 ||
-            x >= _columnCount ||
-            y < 0 ||
-            y >= _rowCount)
-        {
-            return new(position, null);
+                var neighbourHeight = GetHeightAt(neighbour);
+                if (neighbourHeight - heightAtPosition >= 0)
+                {
+                    visited[neighbour] = position;
+                    queue.Enqueue(neighbour);   
+                }
+            }
         }
+
+        var end = new Coordinate(5, 2);
+        var positionsWithParentOfEnd = visited.Where(x => x.Value == end);
         
-        return new PossibleMove(position, GetHeightAt(position));
+        
+        
+        
+        return 31;
     }
     
+    
+
+    private List<Coordinate> GetNeighbours(Coordinate position)
+    {
+        return new List<Coordinate>
+        {
+            new Coordinate(position.X, position.Y - 1), // up
+            new Coordinate(position.X, position.Y + 1), // down
+            new Coordinate(position.X - 1, position.Y), // left
+            new Coordinate(position.X + 1, position.Y)  // right
+        };
+    }
+
+    // public void FindNextMove()
+    // {
+    //     var currentHeight = GetHeightAt(CurrentPosition);
+    //     
+    //     var up = GetPossibleMove(0, -1);
+    //     var down = GetPossibleMove(0, 1);
+    //     var left = GetPossibleMove(-1, 0);
+    //     var right = GetPossibleMove(1, 0);
+    //     
+    //     List<PossibleMove> possibleMoves = new()
+    //     {
+    //         up,
+    //         down,
+    //         left,
+    //         right
+    //     };
+    //
+    //     var moveToMake = possibleMoves
+    //         .Where(move => move.Height.HasValue && 
+    //                     move.Height.Value - currentHeight >= 0 &&
+    //                     !_visited.Contains(move.Position))
+    //         .OrderByDescending(x => x.Height)
+    //         .First();
+    //
+    //     CurrentPosition = moveToMake.Position;
+    // }
+    //
+    // private PossibleMove GetPossibleMove(int xDelta, int yDelta)
+    // {
+    //     var x = CurrentPosition.X + xDelta;
+    //     var y = CurrentPosition.Y + yDelta;
+    //     var position = new Coordinate(x, y);
+    //
+    //     if (x < 0 ||
+    //         x >= _columnCount ||
+    //         y < 0 ||
+    //         y >= _rowCount)
+    //     {
+    //         return new(position, null);
+    //     }
+    //     
+    //     return new PossibleMove(position, GetHeightAt(position));
+    // }
+
     private char GetHeightAt(Coordinate position)
     {
         var value = Grid[position.Y, position.X];
