@@ -51,7 +51,7 @@ public class HeightMap
         while (queue.Count > 0)
         {
             var position = queue.Dequeue();
-            var heightAtPosition = GetHeightAt(position);
+            var positionHeight = GetHeightAt(position);
             var neighbours = GetNeighbours(position);
             foreach (var neighbour in neighbours)
             {
@@ -65,7 +65,7 @@ public class HeightMap
                 }
 
                 var neighbourHeight = GetHeightAt(neighbour);
-                if (neighbourHeight - heightAtPosition >= 0)
+                if (neighbourHeight >= positionHeight)
                 {
                     visited[neighbour] = position;
                     queue.Enqueue(neighbour);   
@@ -74,12 +74,19 @@ public class HeightMap
         }
 
         var end = new Coordinate(5, 2);
-        var positionsWithParentOfEnd = visited.Where(x => x.Value == end);
+        var endPositions = visited.Where(x => x.Key == end);
+        var stepCount = 1;
+        foreach (var endPosition in endPositions)
+        {
+            var current = endPosition.Key;
+            while (current != start)
+            {
+                current = visited[current];
+                stepCount++;
+            }
+        }
         
-        
-        
-        
-        return 31;
+        return stepCount;
     }
     
     
