@@ -1,8 +1,11 @@
+using System.Diagnostics.Tracing;
+
 namespace CpuRegister;
 
 public class Cpu
 {
     private readonly List<Register> _cycles = new();
+    private readonly Crt  _crt = new();
 
     public int RegisterX { get; private set; } = 1;
     public int CycleCount => _cycles.Count;
@@ -25,12 +28,15 @@ public class Cpu
         {
             case "noop":
                 _cycles.Add(new Register(RegisterX, RegisterX));
+                _crt.Draw(CycleCount, RegisterX);
                 break;
             case "addx":
                 _cycles.Add(new Register(RegisterX, RegisterX));
+                _crt.Draw(CycleCount, RegisterX);
                 
                 var newRegisterX = RegisterX + value;
                 _cycles.Add(new Register(RegisterX, newRegisterX));
+                _crt.Draw(CycleCount, RegisterX);
                 RegisterX = newRegisterX;
                 
                 break;
@@ -45,5 +51,10 @@ public class Cpu
     public int GetTotalSignalStrengthAtCycles(params int[] cycleNumbers)
     {
         return cycleNumbers.Sum(GetSignalStrengthAtCycle);
+    }
+
+    public string[] PrintScreen()
+    {
+        return _crt.PrintScreen();
     }
 }

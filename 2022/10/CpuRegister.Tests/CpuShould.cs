@@ -1,9 +1,17 @@
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace CpuRegister.Tests;
 
 public class CpuShould
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public CpuShould(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Theory]
     [InlineData("noop", 1)]
     [InlineData("addx 3", 2)]
@@ -62,5 +70,29 @@ public class CpuShould
         sut.Execute(inputLines);
         
         sut.GetTotalSignalStrengthAtCycles(20, 60, 100, 140, 180, 220).Should().Be(expectedSignalStrength);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", "SampleInput_Output.txt")]
+    [InlineData("MyInput.txt", "MyInput_Output.txt")]
+    public void Print_Screen(
+        string inputFile,
+        string expectedOutputFile)
+    {
+        var inputLines = File.ReadAllLines(@$"TestData\{inputFile}");
+        var expectedOutputLines = File.ReadAllLines(@$"TestData\{expectedOutputFile}");
+        
+        var sut = new Cpu();
+        sut.Execute(inputLines);
+
+        var actual = sut.PrintScreen();
+
+        foreach (var line in actual)
+        {
+            _testOutputHelper.WriteLine(line);
+        }
+        actual.Should().BeEquivalentTo(expectedOutputLines);
+        
+        
     }
 }
