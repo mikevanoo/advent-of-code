@@ -42,6 +42,9 @@ public class WorriedMonkeys
 
     private void PlayTurn(Monkey monkey)
     {
+        // using the product of all test divisors ensures that:
+        // i) we keep the worry level numbers small
+        // ii) when we transfer an item to another monkey then the worry level will continue to work with their test divisor
         var testFactor = Monkeys.Aggregate(1L, (f, m) => f * m.TestDivisor);
         
         for (var index = 0; index < monkey.Items.Count; index++)

@@ -74,7 +74,10 @@ public partial class Monkey
         {
             worryLevel = Math.DivRem(worryLevel, 3).Quotient;
         }
-
+ 
+        // using the product of all test divisors ensures that:
+        // i) we keep the worry level numbers small
+        // ii) when we transfer an item to another monkey then the worry level will continue to work with their test divisor
         worryLevel %= testFactor;
 
         var throwToMonkeyIndex = worryLevel % TestDivisor == 0
