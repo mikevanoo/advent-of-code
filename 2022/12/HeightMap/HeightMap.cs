@@ -49,13 +49,50 @@ public class HeightMap
         }
     }
 
-    public int GetFewestStepsToBestSignal()
+    public int GetFewestStepsToBestSignalMultipleStartingPoint()
+    {
+        var fewestSteps = int.MaxValue;
+        var startingPoints = FindAllStartingPoints();
+        
+        foreach (var startingPoint in startingPoints)
+        {
+            var steps = GetFewestStepsToBestSignal(startingPoint);
+            if (steps > 0)
+            {
+                fewestSteps = Math.Min(fewestSteps, steps);   
+            }
+        }
+
+        return fewestSteps;
+    }
+    
+    public List<Coordinate> FindAllStartingPoints()
+    {
+        List<Coordinate> startingPoints = new();
+        
+        for (var rowIndex = 0; rowIndex < _rowCount; rowIndex++)
+        {
+            for (var columnIndex = 0; columnIndex < _columnCount; columnIndex++)
+            {
+                var position = new Coordinate(columnIndex, rowIndex);
+                if (GetHeightAt(position) == 'a')
+                {
+                    startingPoints.Add(position);
+                }
+            }
+        }
+
+        return startingPoints;
+    }
+
+    public int GetFewestStepsToBestSignal(Coordinate? startingPoint = null)
     {
         var queue = new Queue<Coordinate>();
         var visited = new Dictionary<Coordinate, Coordinate>();
 
-        visited[_start] = _start;
-        queue.Enqueue(_start);
+        var start = startingPoint ?? _start;
+        visited[start] = start;
+        queue.Enqueue(start);
 
         while (queue.Count > 0)
         {
@@ -87,7 +124,7 @@ public class HeightMap
         foreach (var endPosition in endPositions)
         {
             var current = endPosition.Key;
-            while (current != _start)
+            while (current != start)
             {
                 current = visited[current];
                 stepCount++;

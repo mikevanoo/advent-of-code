@@ -32,4 +32,30 @@ public class HeightMapShould
         sut.GetFewestStepsToBestSignal().Should().Be(expectedStepCount);
     }
     
+    [Theory]
+    [InlineData("SampleInput.txt", 6)]
+    public void Find_All_Starting_Points(
+        string inputFile,
+        int expectedCount)
+    {
+        var inputLines = File.ReadAllLines(@$"TestData\{inputFile}");
+        var sut = new HeightMap();
+        sut.ParseInput(inputLines);
+
+        sut.FindAllStartingPoints().Count.Should().Be(expectedCount);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 29)]
+    [InlineData("MyInput.txt", 332)]
+    public void Get_Fewest_Steps_To_Best_Signal_Multiple_Starting_Points(
+        string inputFile,
+        int expectedStepCount)
+    {
+        var inputLines = File.ReadAllLines(@$"TestData\{inputFile}");
+        var sut = new HeightMap();
+        sut.ParseInput(inputLines);
+
+        sut.GetFewestStepsToBestSignalMultipleStartingPoint().Should().Be(expectedStepCount);
+    }
 }
