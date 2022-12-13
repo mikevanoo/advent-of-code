@@ -18,33 +18,44 @@ public class PacketPair
 
     public bool IsInCorrectOrder()
     {
-        return IsInCorrectOrder(_left.Value, _right.Value).Value;
+        return IsInCorrectOrder(_left.Value, _right.Value) > 0;
     }
 
-    private bool? IsInCorrectOrder(JToken leftArray, JToken rightArray)
+    private int IsInCorrectOrder(JToken leftArray, JToken rightArray)
     {
         if (leftArray.Type == JTokenType.Integer && rightArray.Type == JTokenType.Integer)
         {
-            if ((int)leftArray != (int)rightArray)
-            {
-                return (int)leftArray < (int)rightArray;
-            }
+            return Math.Sign((int)rightArray - (int)leftArray);
         }
-        else
+
+        if (leftArray.Type == JTokenType.Array &&
+            leftArray.Count() == 1 &&
+            !leftArray[0].HasValues &&
+            rightArray.Type == JTokenType.Array && 
+            rightArray.Count() == 1 &&
+            !rightArray[0].HasValues)
         {
-            for (var index = 0; index < leftArray.Values().Count(); index++)
+            return IsInCorrectOrder(leftArray[0], rightArray[0]);
+        }
+
+        if (!leftArray.Any()) { return 1; }
+        if (!rightArray.Any()) { return -1; }
+            
+        for (var index = 0; index < leftArray.Values().Count(); index++)
+        {
+            if (index > leftArray.Count() - 1) { return 1; }
+            if (index > rightArray.Count() - 1) { return -1; }
+                
+            var result = IsInCorrectOrder(
+                leftArray[index].Type != JTokenType.Array ? new JArray(leftArray[index]) : leftArray[index], 
+                rightArray[index].Type != JTokenType.Array ? new JArray(rightArray[index]) : rightArray[index]);
+            if (result != 0)
             {
-                var result = IsInCorrectOrder(
-                    leftArray[index].Type != JTokenType.Array ? new JArray(leftArray[index]) : leftArray[index], 
-                    rightArray[index].Type != JTokenType.Array ? new JArray(rightArray[index]) : rightArray[index]);
-                if (result.HasValue)
-                {
-                    return result;
-                }
+                return result;
             }
         }
-        
-        return null;
+
+        return 0;
     }
 
     public override string ToString()

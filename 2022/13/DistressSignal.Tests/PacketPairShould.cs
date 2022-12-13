@@ -26,6 +26,11 @@ public class PacketPairShould
     [InlineData(1, true)]
     [InlineData(2, true)]
     [InlineData(3, false)]
+    [InlineData(4, true)]
+    [InlineData(5, false)]
+    [InlineData(6, true)]
+    [InlineData(7, false)]
+    [InlineData(8, false)]
     public void Determine_If_Pair_Is_In_Correct_Order_In_Sample_Input(
         int pairNumber,
         bool expectedIsInCorrectOrder)
@@ -42,4 +47,32 @@ public class PacketPairShould
         sut.IsInCorrectOrder().Should().Be(expectedIsInCorrectOrder);
     }
     
+    [Theory]
+    [InlineData("SampleInput.txt", 13)]
+    [InlineData("MyInput.txt", 13)]
+    public void Sum_Packet_Pair_Indexes_That_Are_In_The_Correct_Order(
+        string inputFile,
+        int expectedSum)
+    {
+        var inputLines = File.ReadAllLines($@"TestData\{inputFile}");
+        var chunkedLines = inputLines
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Chunk(2)
+            .ToList();
+
+        var sum = 0;
+        for (var index = 0; index < chunkedLines.Count(); index++)
+        {
+            var inputLineChunk = chunkedLines[index];
+            
+            var sut = new PacketPair();
+            sut.ParseInput(inputLineChunk[0], inputLineChunk[1]);
+            if (sut.IsInCorrectOrder())
+            {
+                sum += index + 1;
+            }
+        }
+
+        sum.Should().Be(expectedSum);
+    }
 }
