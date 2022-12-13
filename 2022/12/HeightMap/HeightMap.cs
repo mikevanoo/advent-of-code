@@ -6,6 +6,8 @@ public class HeightMap
     private int _columnCount;
     private readonly List<Coordinate> _visited = new();
     private Coordinate _currentPosition;
+    private Coordinate _start;
+    private Coordinate _end;
 
     public char[,] Grid { get; private set; } = new char[1,1];
 
@@ -35,6 +37,14 @@ public class HeightMap
             for (var columnIndex = 0; columnIndex < _columnCount; columnIndex++)
             {
                 Grid[rowIndex, columnIndex] = inputLines[rowIndex][columnIndex];
+                if (Grid[rowIndex, columnIndex] == 'S')
+                {
+                    _start = new Coordinate(columnIndex, rowIndex);
+                }
+                if (Grid[rowIndex, columnIndex] == 'E')
+                {
+                    _end = new Coordinate(columnIndex, rowIndex);
+                }
             }
         }
     }
@@ -44,9 +54,8 @@ public class HeightMap
         var queue = new Queue<Coordinate>();
         var visited = new Dictionary<Coordinate, Coordinate>();
 
-        var start = new Coordinate(0, 0);
-        visited[start] = start;
-        queue.Enqueue(start);
+        visited[_start] = _start;
+        queue.Enqueue(_start);
 
         while (queue.Count > 0)
         {
@@ -65,7 +74,7 @@ public class HeightMap
                 }
 
                 var neighbourHeight = GetHeightAt(neighbour);
-                if (neighbourHeight >= positionHeight)
+                if (neighbourHeight - positionHeight <= 1)
                 {
                     visited[neighbour] = position;
                     queue.Enqueue(neighbour);   
@@ -73,13 +82,12 @@ public class HeightMap
             }
         }
 
-        var end = new Coordinate(5, 2);
-        var endPositions = visited.Where(x => x.Key == end);
-        var stepCount = 1;
+        var endPositions = visited.Where(x => x.Key == _end);
+        var stepCount = 0;
         foreach (var endPosition in endPositions)
         {
             var current = endPosition.Key;
-            while (current != start)
+            while (current != _start)
             {
                 current = visited[current];
                 stepCount++;
@@ -89,8 +97,6 @@ public class HeightMap
         return stepCount;
     }
     
-    
-
     private List<Coordinate> GetNeighbours(Coordinate position)
     {
         return new List<Coordinate>
@@ -101,50 +107,6 @@ public class HeightMap
             new Coordinate(position.X + 1, position.Y)  // right
         };
     }
-
-    // public void FindNextMove()
-    // {
-    //     var currentHeight = GetHeightAt(CurrentPosition);
-    //     
-    //     var up = GetPossibleMove(0, -1);
-    //     var down = GetPossibleMove(0, 1);
-    //     var left = GetPossibleMove(-1, 0);
-    //     var right = GetPossibleMove(1, 0);
-    //     
-    //     List<PossibleMove> possibleMoves = new()
-    //     {
-    //         up,
-    //         down,
-    //         left,
-    //         right
-    //     };
-    //
-    //     var moveToMake = possibleMoves
-    //         .Where(move => move.Height.HasValue && 
-    //                     move.Height.Value - currentHeight >= 0 &&
-    //                     !_visited.Contains(move.Position))
-    //         .OrderByDescending(x => x.Height)
-    //         .First();
-    //
-    //     CurrentPosition = moveToMake.Position;
-    // }
-    //
-    // private PossibleMove GetPossibleMove(int xDelta, int yDelta)
-    // {
-    //     var x = CurrentPosition.X + xDelta;
-    //     var y = CurrentPosition.Y + yDelta;
-    //     var position = new Coordinate(x, y);
-    //
-    //     if (x < 0 ||
-    //         x >= _columnCount ||
-    //         y < 0 ||
-    //         y >= _rowCount)
-    //     {
-    //         return new(position, null);
-    //     }
-    //     
-    //     return new PossibleMove(position, GetHeightAt(position));
-    // }
 
     private char GetHeightAt(Coordinate position)
     {
