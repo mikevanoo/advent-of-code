@@ -1,15 +1,18 @@
+using System.Text;
+
 namespace Cave;
 
 public class Cave
 {
-    public const int GridPadding = 1;
+    public const int GridPaddingX = 500;
+    public const int GridPaddingY = 3;
     
     public CellContents[,] Grid { get; private set; } = new CellContents[1, 1];
 
     private int _rowSize;
     private int _columnSize;
     
-    public void CreateGrid(string[] inputLines)
+    public void CreateGrid(string[] inputLines, bool drawFloor = false)
     {
         // size the grid
         var maxX = 0;
@@ -25,16 +28,21 @@ public class Cave
             }
         }
 
-        _rowSize = maxX + GridPadding;
-        _columnSize = maxY + GridPadding;
+        _rowSize = maxX + GridPaddingX;
+        _columnSize = maxY + GridPaddingY;
         Grid = new CellContents[_rowSize, _columnSize];
 
-        // init everything to air
+        // init everything to air and the floor to rocks
         for (var x = 0; x < _rowSize; x++)
         {
             for (var y = 0; y < _columnSize; y++)
             {
                 Grid[x, y] = CellContents.Air;
+            }
+
+            if (drawFloor)
+            {
+                Grid[x, _columnSize - 1] = CellContents.Rock;
             }
         }
         
@@ -83,6 +91,11 @@ public class Cave
             var x = 500;
             var y = 0;
             var cell = Grid[x, y];
+
+            if (cell == CellContents.Sand)
+            {
+                return sandCount;
+            }
             
             while (cell == CellContents.Air)
             {
@@ -97,26 +110,23 @@ public class Cave
                 {
                     y++;
                 }
+                // move down and left?
+                else if (IsAir(x - 1, y + 1))
+                {
+                    x--;
+                    y++;
+                }
+                // move down and right?
+                else if (IsAir(x + 1, y + 1))
+                {
+                    x++;
+                    y++;
+                }
+                // can't move so make the cell sand
                 else
                 {
-                    // move down and left?
-                    if (IsAir(x - 1, y + 1))
-                    {
-                        x--;
-                        y++;
-                    }
-                    // move down and right?
-                    else if (IsAir(x + 1, y + 1))
-                    {
-                        x++;
-                        y++;
-                    }
-                    // make the cell sand
-                    else
-                    {
-                        Grid[x, y] = CellContents.Sand;
-                        break;
-                    }
+                    Grid[x, y] = CellContents.Sand;
+                    break;
                 }
                 
                 cell = Grid[x, y];
@@ -128,6 +138,35 @@ public class Cave
         return sandCount;
     }
 
+    public string PrintGrid()
+    {
+        StringBuilder result = new();
+        
+        for (var y = 0; y < _columnSize; y++)
+        {
+            for (var x = 480; x < 520; x++)
+            {
+                switch (Grid[x, y])
+                {
+                    case CellContents.Air:
+                        result.Append(".");
+                        break;
+                    case CellContents.Rock:
+                        result.Append("#");
+                        break;
+                    case CellContents.Sand:
+                        result.Append("o");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            result.AppendLine();
+        }
+
+        return result.ToString();
+    }
+    
     public bool IsRock(int x, int y) => IsContents(x, y, CellContents.Rock);
     public bool IsSand(int x, int y) => IsContents(x, y, CellContents.Sand);
     public bool IsAir(int x, int y) => IsContents(x, y, CellContents.Air);
