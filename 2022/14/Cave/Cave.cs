@@ -88,12 +88,14 @@ public class Cave
 
         while (sandCount < (numberOfSandUnits ?? int.MaxValue))
         {
+            // position of sand spout
             var x = 500;
             var y = 0;
             var cell = Grid[x, y];
 
             if (cell == CellContents.Sand)
             {
+                // the sand spout is blocked with sand
                 return sandCount;
             }
             
@@ -129,6 +131,7 @@ public class Cave
                     break;
                 }
                 
+                // move to look at the next cell
                 cell = Grid[x, y];
             }
             
@@ -144,18 +147,18 @@ public class Cave
         
         for (var y = 0; y < _columnSize; y++)
         {
-            for (var x = 480; x < 520; x++)
+            for (var x = 300; x < 700; x++)
             {
                 switch (Grid[x, y])
                 {
                     case CellContents.Air:
-                        result.Append(".");
+                        result.Append('.');
                         break;
                     case CellContents.Rock:
-                        result.Append("#");
+                        result.Append('#');
                         break;
                     case CellContents.Sand:
-                        result.Append("o");
+                        result.Append('o');
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -167,10 +170,10 @@ public class Cave
         return result.ToString();
     }
     
-    public bool IsRock(int x, int y) => IsContents(x, y, CellContents.Rock);
-    public bool IsSand(int x, int y) => IsContents(x, y, CellContents.Sand);
-    public bool IsAir(int x, int y) => IsContents(x, y, CellContents.Air);
-    private bool IsContents(int x, int y, CellContents contents)
+    public bool IsRock(int x, int y) => IsContentsOf(x, y, CellContents.Rock);
+    public bool IsSand(int x, int y) => IsContentsOf(x, y, CellContents.Sand);
+    public bool IsAir(int x, int y) => IsContentsOf(x, y, CellContents.Air);
+    private bool IsContentsOf(int x, int y, CellContents contents)
     {
         return Grid[x, y] == contents;
     }

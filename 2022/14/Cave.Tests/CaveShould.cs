@@ -104,6 +104,7 @@ public class CaveShould
         sut.CreateGrid(inputLines);
         
         sut.DropSand().Should().Be(expectedSandCount);
+        _testOutputHelper.WriteLine(sut.PrintGrid());
     }
 
     [Fact]
@@ -169,5 +170,6 @@ public class CaveShould
         sut.CreateGrid(inputLines, true);
         
         sut.DropSand().Should().Be(expectedSandCount);
+        _testOutputHelper.WriteLine(sut.PrintGrid());
     }
 }
