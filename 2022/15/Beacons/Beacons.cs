@@ -96,15 +96,17 @@ public partial class Beacons
 
         var keys = Cells.Keys
             .OrderBy(k => k.Y)
-            .ThenBy(k => k.X);
+            .ThenBy(k => k.X)
+            .ToList();
 
-        int currentY = 0;
+        int currentY = keys.First().Y;
+        result.Append(currentY.ToString().PadRight(3));
         foreach (var key in keys)
         {
             if (key.Y > currentY)
             {
                 result.AppendLine();
-                result.Append($"{key.Y}  ");
+                result.Append(key.Y.ToString().PadRight(3));
             }
             
             switch (Cells[key])
