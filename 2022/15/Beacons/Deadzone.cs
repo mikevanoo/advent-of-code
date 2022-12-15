@@ -23,10 +23,10 @@ public class Deadzone
         return IsInPolygon(_polygon, testPoint);
     }
     
-    // adapted from https://stackoverflow.com/a/7123291
-    public static bool IsInPolygon(Point[] poly, Point p)
+    private static bool IsInPolygon(Point[] poly, Point p)
     {
-        // this doesn't work for the top, right, bottom, right points themselves
+        // adapted from https://stackoverflow.com/a/7123291
+        // the code below doesn't work for the top, right, bottom, right points themselves
         // so we check those explicitly first
         if (poly.Contains(p))
         {

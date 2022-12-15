@@ -1,9 +1,17 @@
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace Beacons.Tests;
 
 public class DeadzoneShould
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public DeadzoneShould(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Theory]
     [InlineData(8, -3, false, "above top")]
     [InlineData(7, -2, false, "left of top")]
@@ -30,5 +38,95 @@ public class DeadzoneShould
         string because)
     {
         new Deadzone(new Coordinate(8, 7), 9).Contains(new Coordinate(x, y)).Should().Be(expected, because);
+    }
+    
+    [Theory]
+    [InlineData(8, -2, -1, 7)]
+    public void Determine_If_The_Points_Along_Top_To_Left_Edge_Are_Contained_Within_The_Deadzone(
+        int startX,
+        int startY,
+        int endX,
+        int endY)
+    {
+        var sut = new Deadzone(new Coordinate(8, 7), 9);
+        var currentX = startX;
+        var currentY = startY;
+        
+        while (currentX >= endX && currentY <= endY)
+        {
+            _testOutputHelper.WriteLine($"Checking  {currentX}, {currentY}");
+            sut.Contains(new Coordinate(currentX, currentY)).Should().Be(true);
+            currentX--;
+            currentY++;
+        }
+    }
+    
+    [Theory]
+    [InlineData(8, -2, 17, 7)]
+    public void Determine_If_The_Points_Along_Top_To_Right_Edge_Are_Contained_Within_The_Deadzone(
+        int startX,
+        int startY,
+        int endX,
+        int endY)
+    {
+        var sut = new Deadzone(new Coordinate(8, 7), 9);
+        var currentX = startX;
+        var currentY = startY;
+        
+        while (currentX <= endX && currentY <= endY)
+        {
+            _testOutputHelper.WriteLine($"Checking  {currentX}, {currentY}");
+            sut.Contains(new Coordinate(currentX, currentY)).Should().Be(true);
+            currentX++;
+            currentY++;
+        }
+    }
+    
+    [Theory]
+    [InlineData(8, 16, 17, 7)]
+    public void Determine_If_The_Points_Along_Bottom_To_Right_Edge_Are_Contained_Within_The_Deadzone(
+        int startX,
+        int startY,
+        int endX,
+        int endY)
+    {
+        var sut = new Deadzone(new Coordinate(8, 7), 9);
+        var currentX = startX;
+        var currentY = startY;
+        
+        while (currentX <= endX && currentY >= endY)
+        {
+            _testOutputHelper.WriteLine($"Checking  {currentX}, {currentY}");
+            
+            // TODO many cases on this edge fail!!
+            sut.Contains(new Coordinate(currentX, currentY)).Should().Be(true);
+            
+            currentX++;
+            currentY--;
+        }
+    }
+    
+    [Theory]
+    [InlineData(8, 16, -1, 7)]
+    public void Determine_If_The_Points_Along_Bottom_To_Left_Edge_Are_Contained_Within_The_Deadzone(
+        int startX,
+        int startY,
+        int endX,
+        int endY)
+    {
+        var sut = new Deadzone(new Coordinate(8, 7), 9);
+        var currentX = startX;
+        var currentY = startY;
+        
+        while (currentX >= endX && currentY >= endY)
+        {
+            _testOutputHelper.WriteLine($"Checking  {currentX}, {currentY}");
+            
+            // TODO many cases on this edge fail!!
+            sut.Contains(new Coordinate(currentX, currentY)).Should().Be(true);
+            
+            currentX--;
+            currentY--;
+        }
     }
 }
