@@ -97,10 +97,7 @@ public class DeadzoneShould
         while (currentX <= endX && currentY >= endY)
         {
             _testOutputHelper.WriteLine($"Checking  {currentX}, {currentY}");
-            
-            // TODO many cases on this edge fail!!
             sut.Contains(new Coordinate(currentX, currentY)).Should().Be(true);
-            
             currentX++;
             currentY--;
         }
@@ -121,10 +118,7 @@ public class DeadzoneShould
         while (currentX >= endX && currentY >= endY)
         {
             _testOutputHelper.WriteLine($"Checking  {currentX}, {currentY}");
-            
-            // TODO many cases on this edge fail!!
             sut.Contains(new Coordinate(currentX, currentY)).Should().Be(true);
-            
             currentX--;
             currentY--;
         }

@@ -20,55 +20,42 @@ public class Deadzone
     public bool Contains(Coordinate testCoordinate)
     {
         var testPoint = new Point(testCoordinate.X, testCoordinate.Y);
-        return IsInPolygon(_polygon, testPoint);
+        return IsInPolygon(testPoint, _polygon);
     }
     
-    private static bool IsInPolygon(Point[] poly, Point p)
+    private static bool IsInPolygon(Point point, IList<Point> polygon)
     {
-        // adapted from https://stackoverflow.com/a/7123291
-        // the code below doesn't work for the top, right, bottom, right points themselves
-        // so we check those explicitly first
-        if (poly.Contains(p))
+        // adapted from https://stackoverflow.com/a/57624683
+        
+        var intersects = new List<int>();
+        var a = polygon.Last();
+        foreach (var b in polygon)
         {
-            return true;
-        }
-
-        bool inside = false;
-
-        if (poly.Length < 3)
-        {
-            return inside;
-        }
-
-        var oldPoint = new Point(poly[^1].X, poly[^1].Y);
-
-        for (var i = 0; i < poly.Length; i++)
-        {
-            var newPoint = new Point(poly[i].X, poly[i].Y);
-
-            Point p1;
-            Point p2;
-            if (newPoint.X > oldPoint.X)
+            if (b.X == point.X && b.Y == point.Y)
             {
-                p1 = oldPoint;
-                p2 = newPoint;
-            }
-            else
-            {
-                p1 = newPoint;
-                p2 = oldPoint;
+                return true;
             }
 
-            if ((newPoint.X < p.X) == (p.X <= oldPoint.X)
-                && (p.Y - (long) p1.Y)*(p2.X - p1.X)
-                < (p2.Y - (long) p1.Y)*(p.X - p1.X))
+            if (b.X == a.X && point.X == a.X && point.X >= Math.Min(a.Y, b.Y) && point.Y <= Math.Max(a.Y, b.Y))
             {
-                inside = !inside;
+                return true;
             }
 
-            oldPoint = newPoint;
+            if (b.Y == a.Y && point.Y == a.Y && point.X >= Math.Min(a.X, b.X) && point.X <= Math.Max(a.X, b.X))
+            {
+                return true;
+            }
+
+            if ((b.Y < point.Y && a.Y >= point.Y) || (a.Y < point.Y && b.Y >= point.Y))
+            {
+                var px = (int)(b.X + 1.0 * (point.Y - b.Y) / (a.Y - b.Y) * (a.X - b.X));
+                intersects.Add(px);
+            }
+
+            a = b;
         }
 
-        return inside;
+        intersects.Sort();
+        return intersects.IndexOf(point.X) % 2 == 0 || intersects.Count(x => x < point.X) % 2 == 1;
     }
 }
