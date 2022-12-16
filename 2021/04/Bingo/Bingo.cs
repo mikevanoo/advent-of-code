@@ -46,4 +46,33 @@ public class Bingo
 
         return -1;
     }
+
+    public int PlayToLastWinningBoard()
+    {
+        List<int> boardsThatHaveWon = new();
+        
+        for (var calledNumberIndex = 1; calledNumberIndex < _calledNumbers.Length; calledNumberIndex++)
+        {
+            var calledNumbers = _calledNumbers[..calledNumberIndex];
+            LastNumberCalled = calledNumbers[^1];
+            for (var boardIndex = 0; boardIndex < Boards.Count; boardIndex++)
+            {
+                if (Boards[boardIndex].HasWon(calledNumbers))
+                {
+                    if (!boardsThatHaveWon.Contains(boardIndex))
+                    {
+                        boardsThatHaveWon.Add(boardIndex);
+                        if (boardsThatHaveWon.Count == Boards.Count)
+                        {
+                            WinningBoardIndex = boardIndex;
+                            SumOfUnmarkedNumbersOnWinningBoard = Boards[boardIndex].SumOfUnmarkedNumbers;
+                            return WinningBoardIndex;
+                        }   
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
 }
