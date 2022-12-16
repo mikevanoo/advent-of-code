@@ -15,4 +15,15 @@ public static class ArrayExtensions
                 .Select(x => matrix[rowNumber, x])
                 .ToArray();
     }
+    
+    public static IEnumerable<T> Flatten<T>(this T[,] matrix)
+    {
+        for (var rowIndex = 0; rowIndex < matrix.GetLength(0); rowIndex++)
+        {
+            for (var columnIndex = 0; columnIndex < matrix.GetLength(1); columnIndex++)
+            {
+                yield return matrix[rowIndex, columnIndex];
+            }
+        }
+    }
 }
