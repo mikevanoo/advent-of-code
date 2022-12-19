@@ -50,42 +50,41 @@ public class Lava
     
     public int GetTotalSurfaceAreaExcludingAirPockets()
     {
-        var totalSurfaceArea = GetTotalSurfaceArea();
+        var start = new Coordinate3D(0, 0, 0);
+        var q = new Queue<Coordinate3D>();
+        q.Enqueue(start);
+        
+        var closedSet = new HashSet<Coordinate3D>();
+        closedSet.Add(start);
 
-        // check every position in the grid
-        for (var x = 0; x <= _maxX; x++)
+        var virtualGrid = new int[_maxX, _maxY, _maxZ];
+        
+        while (q.Count > 0)
         {
-            for (var y = 0; y <= _maxY; y++)
+            var current = q.Dequeue();
+            foreach (var neighbour in current.Neighbours())
             {
-                for (var z = 0; z <= _maxZ; z++)
-                {
-                    var position = new Coordinate3D(x, y, z);
-                    if (!LavaDropletCubes.Contains(position))
-                    {
-                        // if the position does not contain lava
-                        var neighbourLocations = position.Neighbours();
-                        var positionIsSurrounded = true;
-                        
-                        // check it's neighbours
-                        foreach (var neighbour in neighbourLocations)
-                        {
-                            // if all of the neighbours contain lava then the position is an air pocket
-                            if (!LavaDropletCubes.Contains(neighbour))
-                            {
-                                positionIsSurrounded = false;
-                                break;
-                            }
-                        }
-
-                        if (positionIsSurrounded)
-                        {
-                            totalSurfaceArea -= 6;
-                        }
-                    }
-                }
-            }   
+                if (!neighbour.WithinBoundsOf(virtualGrid)) { continue; }
+                if (closedSet.Contains(neighbour)) { continue; }
+                if (LavaDropletCubes.Contains(neighbour)) { continue; }
+                
+                q.Enqueue(neighbour);
+                closedSet.Add(neighbour);
+            }
         }
-       
-        return totalSurfaceArea;
+
+        var result = 0;
+        foreach (var cube in LavaDropletCubes)
+        {
+            foreach (var neighbour in cube.Neighbours())
+            {
+                if (closedSet.Contains(neighbour))
+                {
+                    result++;
+                }
+            }
+        }
+
+        return result;
     }
 }
