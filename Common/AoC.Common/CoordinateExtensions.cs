@@ -88,4 +88,31 @@ public static class CoordinateExtensions
         
         return neighbours;
     }
+
+    public static List<Coordinate> DrawStraightPathTo(this Coordinate start, Coordinate end)
+    {
+        var diffX = Math.Abs(start.X - end.X);
+        var diffY = Math.Abs(start.Y - end.Y);
+
+        if (diffX != 0 && diffY != 0 && diffX != diffY)
+        {
+            throw new ArgumentException($"Invalid {nameof(DrawStraightPathTo)} arguments: start={start}; end={end}");
+        }
+        
+        var deltaX = Math.Sign(end.X - start.X);
+        var deltaY = Math.Sign(end.Y - start.Y);
+        var stepCount = diffX == 0 ? diffY : diffX;
+
+        List<Coordinate> path = new();
+        var currentX = start.X;
+        var currentY = start.Y;
+        for (var index = 0; index <= stepCount; index++)
+        {
+            path.Add(new Coordinate(currentX, currentY));
+            currentX += deltaX;
+            currentY += deltaY;
+        }
+
+        return path;
+    }
 }

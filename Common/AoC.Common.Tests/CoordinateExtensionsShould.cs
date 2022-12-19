@@ -1,9 +1,17 @@
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace AoC.Common.Tests;
 
 public class CoordinateExtensionsShould
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public CoordinateExtensionsShould(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Theory]
     [InlineData(0, 0, 5, 5, 10)]
     [InlineData(5, 5, 0, 0, 10)]
@@ -168,5 +176,50 @@ public class CoordinateExtensionsShould
             new(x - 1, y + 1),
             new(x + 1, y + 1)
         });
+    }
+    
+    [Theory]
+    [InlineData(-1, -2, 5, 5)]
+    public void Draw_A_Straight_Path_With_Invalid_Coordinates_Throws(
+        int startX, int startY,
+        int endX, int endY)
+    {
+        var start = new Coordinate(startX, startY);
+        var end = new Coordinate(endX, endY);
+        
+        var actual = () => start.DrawStraightPathTo(end);
+
+        actual.Should().ThrowExactly<ArgumentException>();
+    }
+    
+    [Theory]
+    [InlineData(1, 1, 1, 3, 3)]
+    [InlineData(9, 7, 7, 7, 3)]
+    [InlineData(0, 9, 5, 9, 6)]
+    [InlineData(8, 0, 0, 8, 9)]
+    [InlineData(9, 4, 3, 4, 7)]
+    [InlineData(2, 2, 2, 1, 2)]
+    [InlineData(7, 0, 7, 4, 5)]
+    [InlineData(6, 4, 2, 0, 5)]
+    [InlineData(0, 9, 2, 9, 3)]
+    [InlineData(3, 4, 1, 4, 3)]
+    [InlineData(0, 0, 8, 8, 9)]
+    [InlineData(5, 5, 8, 2, 4)]
+    public void Draw_A_Straight_Path_From_A_Coordinate_To_Another(
+        int startX, int startY,
+        int endX, int endY,
+        int expectedStepCount)
+    {
+        var start = new Coordinate(startX, startY);
+        var end = new Coordinate(endX, endY);
+        
+        var actual = start.DrawStraightPathTo(end);
+
+        foreach (var coordinate in actual)
+        {
+            _testOutputHelper.WriteLine(coordinate.ToString());
+        }
+        
+        actual.Should().HaveCount(expectedStepCount);
     }
 }
