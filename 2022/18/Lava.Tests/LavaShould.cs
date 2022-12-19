@@ -12,7 +12,7 @@ public class LavaShould
         var sut = new Lava();
         sut.ParseInput(inputLines);
 
-        sut.LavaDroplets.Count.Should().Be(13);
+        sut.LavaDropletCubes.Count.Should().Be(13);
     }
     
     [Theory]
@@ -26,5 +26,18 @@ public class LavaShould
         sut.ParseInput(inputLines);
 
         sut.GetTotalSurfaceArea().Should().Be(expectedResult);
+    }
+    
+    [Theory]
+    [InlineData("SampleInput.txt", 58)]
+    [InlineData("MyInput.txt", 3466)]
+    public void Get_Total_Surface_Area_Excluding_Air_Pockets(string inputFile, int expectedResult)
+    {
+        var inputLines = File.ReadAllLines(@$"TestData\{inputFile}");
+
+        var sut = new Lava();
+        sut.ParseInput(inputLines);
+
+        sut.GetTotalSurfaceAreaExcludingAirPockets().Should().Be(expectedResult);
     }
 }
