@@ -5,7 +5,7 @@ namespace AoC.Common;
 
 public static partial class StringExtensions
 {
-    [GeneratedRegex(@"[-\d]+")]
+    [GeneratedRegex(@"-?\d+")]
     private static partial Regex GetNumbersRegex();
     
     public static IEnumerable<int> ExtractIntegers(this string value)
