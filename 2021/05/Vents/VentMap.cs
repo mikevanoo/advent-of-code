@@ -7,7 +7,7 @@ public class VentMap
 {
     public Dictionary<Coordinate, int> Vents { get; private set; } = new();
     
-    public void ParseInput(string[] inputLines)
+    public void ParseInput(string[] inputLines, bool includeDiagonals = false)
     {
         foreach (var inputLine in inputLines)
         {
@@ -17,8 +17,7 @@ public class VentMap
             var endX = numbers[2];
             var endY = numbers[3];
             
-            // only consider horizontal and vertical lines
-            if (startX != endX && startY != endY) { continue; }
+            if (!includeDiagonals && startX != endX && startY != endY) { continue; }
             
             var start = new Coordinate(startX, startY);
             var end = new Coordinate(endX, endY);
